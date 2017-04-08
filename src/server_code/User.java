@@ -1,13 +1,19 @@
 package server_code;
 
+import java.util.Scanner;
+
 public class User 
 {
 	String userID;
 	
 	public User(String filename)
 	{
-		//Read file for userID and key
-		//Enter offline state
+		Scanner input = new Scanner(filename);
+		String userID;
+		String userKey;
+
+		userID = input.nextLine();
+		userKey = input.nextLine();
 	}
 	
 	private void Offline()

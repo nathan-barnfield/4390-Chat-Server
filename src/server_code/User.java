@@ -1,8 +1,15 @@
 package server_code;
 
+import java.io.*;
+import java.net.*;
+
 public class User 
 {
-	String userID;
+	String 	userID;
+	boolean inConversation;
+	int		secretKey;
+	int		CK_A;
+	
 	
 	public User(String filename)
 	{

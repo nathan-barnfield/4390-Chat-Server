@@ -1,0 +1,60 @@
+//Server accepting a UDP packet and printing it out.
+
+public class Server implements Runnable{
+	
+	public Server() 
+	{
+		Thread t = new Thread(this);
+		t.run();
+	}
+
+	@Override
+	public void run() {
+		try {
+			byte[] recvbuffer = new byte[1024]; 
+			DatagramPacket received = new DatagramPacket(recvbuffer, 512);
+			DatagramSocket socket = new DatagramSocket(8888);
+			System.out.println("Server started awaiting data on socket");
+			socket.receive(received);
+			System.out.println(received.toString());
+			
+			
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+
+	}
+
+}
+
+//Client submitting a UDP packet
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+
+public class TestClient 
+{
+
+public static void main(String[] args) throws UnknownHostException, SocketException, IOException  {
+    // TODO code application logic here
+    byte[] buffer = {10,23,12,31,43,32,24};
+    InetAddress address = InetAddress.getLocalHost();
+    DatagramPacket packet = new DatagramPacket(
+            buffer, buffer.length, address, 8888
+            );
+    DatagramSocket datagramSocket = new DatagramSocket();
+    datagramSocket.send(packet);
+    System.out.println(InetAddress.getLocalHost().getHostAddress());
+
+
+}
+}
+

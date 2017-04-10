@@ -1,5 +1,6 @@
 package server_code;
 
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -8,6 +9,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class UDP_Handshake extends Thread
 {
+
 
     //log on client send "hello" to server (UPD connection)
 	Map<InetAddress,BlockingQueue<DatagramPacket>> currentConnections = new HashMap<InetAddress,BlockingQueue<DatagramPacket>>();
@@ -68,4 +70,5 @@ public class UDP_Handshake extends Thread
 		}
 		
 	}
+
 }

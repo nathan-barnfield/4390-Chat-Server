@@ -3,10 +3,13 @@ package server_code;
 public class User 
 {
 	String userID;
+	int keyValue;
 	
-	public User(String filename)
+	public User(String name, int key)
 	{
 		//Read file for userID and key
+		userID = name;
+		keyValue = key;
 		//Enter offline state
 	}
 	

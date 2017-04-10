@@ -39,6 +39,23 @@ public class Server {
 	            System.out.println("User "+key+" secret key is: "+userDB.get(key));
 	        }
 	}
+
+
+	
+	/**
+	 * 
+	 * @param username, the username to verify
+	 * @return secret key if username exists, else -1
+	 */
+	public static int VerifyUser(String username)
+	{
+		Object response = userDB.get(username);
+		if (response != null)
+			return (int) response;
+		else
+			return -1;
+				
+	}
 	
 
 	public static void main(String[] args) throws Exception

@@ -31,15 +31,22 @@ public class Server {
 		
 	}
 	
+	public static void printDB()
+	{
+		Set<String> keys = userDB.keySet();
+		 System.out.println("User Hashtable");
+	        for(String key: keys){
+	            System.out.println("User "+key+" secret key is: "+userDB.get(key));
+	        }
+	}
+	
 
 	public static void main(String[] args) throws Exception
 	{
 		Server a = new Server ();
 		a.loadDB(userDBfile);
-		 Set<String> keys = userDB.keySet();
-	        for(String key: keys){
-	            System.out.println("Value of "+key+" is: "+userDB.get(key));
-	        }
+		printDB();
+		 
 
 
 	}

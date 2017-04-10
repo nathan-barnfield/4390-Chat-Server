@@ -5,8 +5,8 @@ import java.util.*;
 import java.io.*;
 import server_code.*;
 public class Server {
-	private static User [] userDB = new User [5];
-	private String fileName;
+	private static Hashtable userDB = new Hashtable<>();
+	private static String userDBfile = "DB.txt";
 
 	public Server(){
 
@@ -14,17 +14,15 @@ public class Server {
 
 
 	public void loadDB(String file){
-		User [] temp = new User [5];
-		int i = 0;
 		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 
 			String sCurrentLine;
 
 			while ((sCurrentLine = br.readLine()) != null) {
-				String [] entries = sCurrentLine.split(",");
-				System.out.println(entries[1]);
-				userDB[i] = new User(entries[0],Integer.valueOf(entries[1]));
-				i++;
+				String userID = sCurrentLine;
+				int secretKey = Integer.parseInt(br.readLine());
+				
+				userDB.put(userID, secretKey);
 			}
 			
 		} catch (IOException e) {
@@ -37,7 +35,12 @@ public class Server {
 	public static void main(String[] args) 
 	{
 		Server a = new Server ();
-		a.loadDB("DB.txt");
+		a.loadDB(userDBfile);
+		 Set<String> keys = userDB.keySet();
+	        for(String key: keys){
+	            System.out.println("Value of "+key+" is: "+userDB.get(key));
+	        }
+
 
 	}
 

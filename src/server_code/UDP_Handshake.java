@@ -1,5 +1,6 @@
 package server_code;
 
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -19,10 +20,11 @@ public class UDP_Handshake extends Thread
 	Map<InetAddress,BlockingQueue<DatagramPacket>> currentConnections = new HashMap<InetAddress,BlockingQueue<DatagramPacket>>();
 	
 	DatagramSocket socket = null;
+	int port = 4445;
 	
 	public UDP_Handshake(String name) throws IOException
 	{
-		socket = new DatagramSocket(4445); //Create a welcome socket on port 4445
+		socket = new DatagramSocket(port); //Create a welcome socket on port 4445
 	}
 	
 	
@@ -34,6 +36,8 @@ public class UDP_Handshake extends Thread
 		{
 			byte[] buf = new byte[1024];
 			DatagramPacket packet = new DatagramPacket(buf, buf.length);
+			
+			
 			
 			try 
 			{
@@ -61,7 +65,7 @@ public class UDP_Handshake extends Thread
 				BlockingQueue<DatagramPacket> newQueue = new LinkedBlockingQueue<DatagramPacket>();
 				
 				currentConnections.put(packet.getAddress(), newQueue);
-				new Authentication_Thread(packet.getAddress(), newQueue, socket).start();
+				new Authentication_Thread(packet.getAddress(), port, newQueue, socket).start();
 				
 				try {
 					newQueue.put(packet);
@@ -74,4 +78,5 @@ public class UDP_Handshake extends Thread
 		}
 		
 	}
+
 }

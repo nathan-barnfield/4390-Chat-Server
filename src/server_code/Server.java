@@ -11,14 +11,19 @@ public class Server {
 	private static Hashtable userDB = new Hashtable<>();
 	private static String userDBfile = "DB.txt";
 	private KeyGenerator keygenerator;
-	private SecretKey myDesKey;
-	private Cipher dCipher;
-	public Server(){
+	private static SecretKey myDesKey;
+	private static Cipher dCipher;
+	public Server() throws IOException{
 		try{
 			keygenerator = KeyGenerator.getInstance("DES");		// encrpyt using DES
 			myDesKey = keygenerator.generateKey();
 			dCipher = Cipher.getInstance("DES");
 			dCipher.init(Cipher.ENCRYPT_MODE, myDesKey);
+			loadDB(userDBfile);
+			printDB();
+			UDP_Handshake handshake = new UDP_Handshake("test?");
+			handshake.start();
+
 		}
 		catch(NoSuchAlgorithmException e){
 			e.printStackTrace();
@@ -55,20 +60,21 @@ public class Server {
 
 
 
-	public int decryptKey(String user){
+	public static int decryptKey(String user){
 		int b = 0;
 		try{
 		   	 	dCipher.init(Cipher.DECRYPT_MODE, myDesKey);	// use DES key to decrpyt
 		    	byte[] textDecrypted = dCipher.doFinal((byte[])userDB.get(user));
 		    	String a = new String (textDecrypted);
 		    	b = Integer.parseInt(a);
-
-		    	return b;
-
+		    	
 				}
 				catch (Exception e){
 				}
-				return b;
+				if (b != 0)
+		    	return b;
+		    	else
+		    		return -1;
 	}
 	
 	public static void printDB()
@@ -90,6 +96,7 @@ public class Server {
 	public static int VerifyUser(String username)
 	{
 		Object response = userDB.get(username);
+
 		if (response != null)
 			return (int) response;
 		else
@@ -101,7 +108,7 @@ public class Server {
 	public static void main(String[] args) throws Exception
 	{
 		Server a = new Server ();
-		a.loadDB(userDBfile);
+		/*a.loadDB(userDBfile);
 		printDB();
 		 
 		 Set<String> keys = userDB.keySet();
@@ -114,7 +121,7 @@ public class Server {
 	        for(String key: keys){
 	            System.out.println("Value of "+key+" is: "+ a.decryptKey(key));
 	        }
-
+		*/
 	        
 
 	}

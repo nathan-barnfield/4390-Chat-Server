@@ -1,15 +1,19 @@
 package server_code;
 
+import java.io.PrintWriter;
+
 public class User 
 {
 	String userID;
 	int keyValue;
+	PrintWriter out = null;
 	
-	public User(String name, int key)
+	
+	public User(String name, PrintWriter printer)
 	{
 		//Read file for userID and key
 		userID = name;
-		keyValue = key;
+		out = printer;
 		//Enter offline state
 	}
 	

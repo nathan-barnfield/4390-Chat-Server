@@ -41,7 +41,7 @@ public class Authentication_Thread extends Thread
 		}
 		
 		String helloUsername = Packet_Helpers.unpack(packet); //Unpack the hello packet for the username
-		int secretKey = Server.VerifyUser(helloUsername); //Grab the users secret key
+		int secretKey = Server.decryptKey(helloUsername); //Grab the users secret key
 		
 		if (secretKey != -1) //If user exists
 		{
@@ -94,6 +94,9 @@ public class Authentication_Thread extends Thread
 		byte[] buffer = new byte[1024];		
 		String challenge = new String ("CHALLENGE"); //Put our challenge into this string
 		buffer = challenge.getBytes();
+		
+		System.out.println(IpAddress);
+		System.out.println(port);
 		
 	    DatagramPacket packet = new DatagramPacket(
 	            buffer, buffer.length, IpAddress, port

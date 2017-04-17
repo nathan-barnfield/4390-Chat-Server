@@ -11,9 +11,9 @@ public class Server {
 	private static Hashtable userDB = new Hashtable<>();
 	private static String userDBfile = "DB.txt";
 	private KeyGenerator keygenerator;
-	private SecretKey myDesKey;
-	private Cipher dCipher;
-	public Server(){
+	private static SecretKey myDesKey;
+	private static Cipher dCipher;
+	public Server() throws IOException{
 		try{
 			keygenerator = KeyGenerator.getInstance("DES");		// encrpyt using DES
 			myDesKey = keygenerator.generateKey();
@@ -21,6 +21,8 @@ public class Server {
 			dCipher.init(Cipher.ENCRYPT_MODE, myDesKey);
 			loadDB(userDBfile);
 			printDB();
+			UDP_Handshake handshake = new UDP_Handshake("test?");
+			handshake.start();
 
 		}
 		catch(NoSuchAlgorithmException e){
@@ -58,7 +60,7 @@ public class Server {
 
 
 
-	public int decryptKey(String user){
+	public static int decryptKey(String user){
 		int b = 0;
 		try{
 		   	 	dCipher.init(Cipher.DECRYPT_MODE, myDesKey);	// use DES key to decrpyt

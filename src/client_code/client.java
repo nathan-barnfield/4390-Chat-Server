@@ -4,7 +4,7 @@ public class Client{
 	private String clientID;
 	private int key;
 
-	CLient (){
+	Client (){
 	}
 
 	public void sendLogin(){

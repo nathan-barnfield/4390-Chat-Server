@@ -8,7 +8,7 @@ public class Client{
 	}
 
 	public void sendLogin(){
-		// send "Logon" msg to SERVER
+		// send "Hello" msg to SERVER
 	}
 
 	public void chatRequest(String client){
@@ -18,7 +18,7 @@ public class Client{
 	}
 
 	public void sendMSG(String msg){
-		// send message
+		// send message to
 	}
 
 	public void rcvMSG(Datagram msg){
@@ -35,7 +35,7 @@ public class Client{
 	}
 
 	public void endChat(){
-			// end chat with 2nd client
+			// end chat with 2nd client, but still maintain connection with UDP.
 	}
 
 	public void sendQuit(){

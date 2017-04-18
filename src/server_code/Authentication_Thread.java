@@ -9,6 +9,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+
+import com.sun.corba.se.impl.ior.ByteBuffer;
+
 import java.util.concurrent.ThreadLocalRandom;
 /**
  * This thread handles the authentication process. It is passed an IP address the packet is originating from, the queue associated with the address, and the socket on which to communicate
@@ -23,7 +26,7 @@ public class Authentication_Thread extends Thread
 	int port = -1;
 	int rand;
 	int secretKey = -1;
-	byte[] challenge;
+	byte[] challenge = new byte [1024];
 	
 	public Authentication_Thread(InetAddress address, int port, BlockingQueue<DatagramPacket> queue, DatagramSocket socket)
 	{
@@ -57,7 +60,7 @@ public class Authentication_Thread extends Thread
 			DatagramPacket cpacket = null;
 			//Generate a challenge hash and get the challenge packet storing the rand to send to user
 			try {
-				cpacket = challengePacket();
+				cpacket = challengePacket(secretKey);
 			} catch (NoSuchAlgorithmException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -76,19 +79,24 @@ public class Authentication_Thread extends Thread
 			
 			//Wait 20 seconds for the user to send a response
 			try {
+				//packet = packetQueue.poll(20, TimeUnit.SECONDS);
 				packet = null;
-				packet = packetQueue.poll(20, TimeUnit.SECONDS);
+				packet = packetQueue.take();
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
 			String response = Packet_Helpers.unpack(packet);
+
 			
 			//Did we receive a packet?
 			if (response != null)
 			{
-				if (response.getBytes() == challenge)
+				byte[] cresponse = new byte[packet.getLength()];
+				cresponse = packet.getData();
+				cresponse = Arrays.copyOfRange(cresponse, 0, packet.getLength());
+				if (Arrays.equals(challenge, cresponse))
 				{
 					//Signal that we're ready to establish a TCP connection to the server
 					packet = Packet_Helpers.stringToPacket("AUTH_SUCC", IpAddress, port);
@@ -132,21 +140,20 @@ public class Authentication_Thread extends Thread
 	}
 	
 	
-	private DatagramPacket challengePacket() throws NoSuchAlgorithmException 
+	private DatagramPacket challengePacket(int sk) throws NoSuchAlgorithmException 
 	{
 		//First, generate the expected challenge and store the result in challenge
-		byte[] password = BigInteger.valueOf(rand+secretKey).toByteArray();
+		int key = rand+sk;
+		byte[] password = BigInteger.valueOf(key).toByteArray();
 		
 		MessageDigest md = MessageDigest.getInstance("MD5");
         md.update(password);	
         challenge = md.digest();
         
-        byte[] randPayload = BigInteger.valueOf(rand).toByteArray();
-
-		//The challenge packet being sent should be the rand
-		/*System.out.println(IpAddress);
-		System.out.println(port);
-		System.out.println(randPayload.length);*/
+       
+        byte[] randPayload = new byte[1024];
+        randPayload = (Integer.toString(rand)).getBytes();
+        
 		
 	    DatagramPacket packet = new DatagramPacket(
 	            randPayload, randPayload.length, IpAddress, port

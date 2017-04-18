@@ -144,6 +144,10 @@ public class Authentication_Thread extends Thread
 	{
 		//First, generate the expected challenge and store the result in challenge
 		int key = rand+sk;
+		StringBuilder sb = new StringBuilder();
+		sb.append(rand);
+		sb.append(sk);
+		key = Integer.parseInt(sb.toString());
 		byte[] password = BigInteger.valueOf(key).toByteArray();
 		
 		MessageDigest md = MessageDigest.getInstance("MD5");

@@ -2,7 +2,11 @@
 package server_code;
 
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.io.*;
+import java.net.DatagramPacket;
+
 import server_code.*;
 import java.security.*;
 import javax.crypto.*;
@@ -13,6 +17,8 @@ public class Server {
 	private KeyGenerator keygenerator;
 	private static SecretKey myDesKey;
 	private static Cipher dCipher;
+	private static BlockingQueue<Message> messageQueue = new LinkedBlockingQueue<Message>();
+	
 	public Server() throws IOException{
 		loadDB(userDBfile);
 		printDB();

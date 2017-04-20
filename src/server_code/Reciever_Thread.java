@@ -21,18 +21,28 @@ public class Reciever_Thread extends Thread
 		
 		public void run()
 		{
+			//Create the input and output streams so that we can communicate with the client
 			try {in = new BufferedReader(new InputStreamReader(socket.getInputStream()));} 	catch (IOException e) {System.out.println("In TCP_Welcome_Thread: Unable to create Buffered Reader");e.printStackTrace();}
 			try {out = new PrintWriter(socket.getOutputStream(), true);} 					catch (IOException e) {System.out.println("In TCP_Welcome_Thread: unable to create PrintWriter");e.printStackTrace();}
 			 
-			String cookie = null;
+			String connMess = null;
 			 
-			try {cookie = in.readLine();} catch (IOException e) {System.out.println("In Reciever Thread: Unable to retrieve transmissions from: " + socket.getInetAddress().toString());e.printStackTrace();}
-			 
-			if(cookieToUserMap.containsKey(Integer.parseInt(cookie)))
+			//Read in the first message sent by the client
+			try {connMess = in.readLine();} catch (IOException e) {System.out.println("In Reciever Thread: Unable to retrieve transmissions from: " + socket.getInetAddress().toString());e.printStackTrace();}
+			
+			//Parse the first message ( All messages are comma delimeted)
+			String[] connMessParts = connMess.split(",");
+			
+			//If the message is a CONNECT request and the cookie passed is in  the cookie-user hashmap, then create a new user and send a connected message to the client
+			if(connMessParts[0].equals("CONNECT") && cookieToUserMap.containsKey(Integer.parseInt(connMessParts[1])))
 				{
-					String name = cookieToUserMap.get(Integer.parseInt(cookie));
+					String name = cookieToUserMap.get(Integer.parseInt(connMessParts[1]));
+					cookieToUserMap.remove(connMessParts[1]);
 					user = new User(name, out);
+					out.println("CONNECTED");
+					//onlinehashMap.put(user);
 				}
+			//If the message is not a CONNECT request or has an invalid cookie, then reject the connection and close all streams and end the thread
 			else
 				{
 					out.println("CONNECTION REFUSED");
@@ -48,6 +58,7 @@ public class Reciever_Thread extends Thread
 			
 			String inMess = null;
 			
+			//while connected parse messages as they are sent
 			while(true)
 			{
 				
@@ -56,8 +67,17 @@ public class Reciever_Thread extends Thread
 				String[] mess = inMess.split(",");
 				
 				
+				
 				switch(mess[0])
 				{
+				case "CHAT_REQUEST":	
+										break;
+				case "END_REQUEST":		
+										break;
+				case "CHAT":			
+										break;
+				case "HISTORY_REQ":		
+										break;
 				
 				}
 				

@@ -4,11 +4,19 @@ import java.io.*;
 import java.math.BigInteger;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.ShortBufferException;
 
 import com.sun.corba.se.impl.ior.ByteBuffer;
 
@@ -104,14 +112,49 @@ public class Authentication_Thread extends Thread
 					
 					try {
 						newuser.encryptor = new BouncyEncryption(rand, secretKey);
+						newuser.encryptor.InitCiphers();
 					} catch (NoSuchAlgorithmException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (InvalidKeyException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (NoSuchProviderException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (NoSuchPaddingException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (InvalidAlgorithmParameterException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					Server.activeUsers.put(helloUsername, newuser); //Store in activeUsers
+					//TCP_Welcome_Thread.cookieToUserMap.put(32, newuser); //Store in cookieToUserMap
+					int cookie = genAndStoreCookie(newuser);
+										
+										
+					try {
+						byte [] encrypteddata = null;
+						encrypteddata = newuser.encryptor.Encrypt("This is a test message.");
+						packet = null;
+						packet = Packet_Helpers.arrayToPacket(encrypteddata, IpAddress, port);
+					} catch (ShortBufferException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (IllegalBlockSizeException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (BadPaddingException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 					
-					Server.activeUsers.put(helloUsername, newuser); //Store in activeUsers
-					TCP_Welcome_Thread.cookieToUserMap.put(32, newuser); //Store in cookieToUserMap
-					packet = Packet_Helpers.stringToPacket("32", IpAddress, port);
+					
 					try {
 						socket.send(packet);
 					} catch (IOException e) {
@@ -177,6 +220,17 @@ public class Authentication_Thread extends Thread
 
 	    return packet;
 
+	}
+	
+	private int genAndStoreCookie(User newuser)
+	{
+		int randint = 0;
+		while (TCP_Welcome_Thread.cookieToUserMap.containsKey(randint))
+		{
+			randint = ThreadLocalRandom.current().nextInt(0, 2048);
+		}
+		TCP_Welcome_Thread.cookieToUserMap.put(randint, newuser);
+		return randint;
 	}
 	
 	

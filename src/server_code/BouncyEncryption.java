@@ -1,5 +1,8 @@
 package server_code;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
 /*
  * Copyright (C) 2011 www.itcsolutions.eu
  *
@@ -79,7 +82,7 @@ public class BouncyEncryption {
 		
 		MessageDigest digest = MessageDigest.getInstance("SHA-256");
 		key = digest.digest((sb.toString()).getBytes(StandardCharsets.UTF_8));
-		key = Arrays.copyOfRange(key, 0, 127);
+		//key = Arrays.copyOfRange(key, 0, 127);
 		
         //default IV value initialized with 0
         IV = new byte[blockSize];
@@ -159,6 +162,33 @@ public class BouncyEncryption {
        fos.close();
        fis.close();
     }
+    
+    public byte[] Encrypt(String s) throws ShortBufferException, IllegalBlockSizeException, BadPaddingException, IOException
+    {
+    	String sn = s + "\u0003";
+    	InputStream fis = new ByteArrayInputStream(sn.getBytes());
+    	ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    	
+    	CBCEncrypt(fis, bos);
+    	byte[] buffer = bos.toByteArray();
+    	return buffer;
+    }
+    
+    public String Decrypt(byte[] encrypted) throws ShortBufferException, IllegalBlockSizeException, BadPaddingException, IOException
+    {
+    	ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    	ByteArrayInputStream bis = new ByteArrayInputStream(encrypted);
+
+    	
+    	CBCDecrypt(bis,bos);
+    	String unsplit = new String(bos.toByteArray());
+    	String[] splitstrings = unsplit.split("\u0003");
+    	
+    	String strdecrypt = new String(splitstrings[0].getBytes());
+    	return strdecrypt;
+    }
+    
+    
     public void CBCDecrypt(InputStream fis, OutputStream fos)
             throws IOException,
             ShortBufferException,

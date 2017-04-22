@@ -16,7 +16,7 @@ public class Reciever_Thread extends Thread
 		public Reciever_Thread(Socket connection,HashMap<Integer, User> ckToUsr)
 		{
 			socket = connection;
-			cookieToUserMap = ckToUsr;
+			cookieToUserMap = cookieToUserMap2;
 		}
 		
 		public void run()

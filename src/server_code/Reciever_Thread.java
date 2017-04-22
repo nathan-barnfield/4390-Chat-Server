@@ -10,13 +10,13 @@ public class Reciever_Thread extends Thread
 		Socket socket = null;
 		BufferedReader in = null;
 		PrintWriter out = null;
-		HashMap<Integer, String> cookieToUserMap = null;
+		HashMap<Integer, User> cookieToUserMap = null;
 		User user = null;
 		
-		public Reciever_Thread(Socket connection,HashMap<Integer, String> ckToUsr)
+		public Reciever_Thread(Socket connection,HashMap<Integer, User> cookieToUserMap2)
 		{
 			socket = connection;
-			cookieToUserMap = ckToUsr;
+			cookieToUserMap = cookieToUserMap2;
 		}
 		
 		public void run()
@@ -30,8 +30,7 @@ public class Reciever_Thread extends Thread
 			 
 			if(cookieToUserMap.containsKey(Integer.parseInt(cookie)))
 				{
-					String name = cookieToUserMap.get(Integer.parseInt(cookie));
-					user = new User(name, out);
+					User name = cookieToUserMap.get(Integer.parseInt(cookie));
 				}
 			else
 				{

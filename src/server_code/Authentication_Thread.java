@@ -99,6 +99,18 @@ public class Authentication_Thread extends Thread
 				if (Arrays.equals(challenge, cresponse))
 				{
 					//Signal that we're ready to establish a TCP connection to the server
+					//Create a new user, set the encryptor, put it in the activeUsers
+					User newuser = new User(helloUsername, null);
+					
+					try {
+						newuser.encryptor = new BouncyEncryption(rand, secretKey);
+					} catch (NoSuchAlgorithmException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
+					Server.activeUsers.put(helloUsername, newuser); //Store in activeUsers
+					TCP_Welcome_Thread.cookieToUserMap.put(32, newuser); //Store in cookieToUserMap
 					packet = Packet_Helpers.stringToPacket("AUTH_SUCC", IpAddress, port);
 					try {
 						socket.send(packet);

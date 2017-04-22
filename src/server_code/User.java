@@ -7,6 +7,7 @@ public class User
 	String userID;
 	int keyValue;
 	PrintWriter out = null;
+	BouncyEncryption encryptor= null;
 	
 	
 	public User(String name, PrintWriter printer)

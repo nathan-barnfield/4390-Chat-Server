@@ -7,11 +7,11 @@ import java.util.*;
 public class TCP_Welcome_Thread extends Thread
 {
 	
-	HashMap<Integer, String> cookieToUserMap = null;
+	public static HashMap<Integer, User> cookieToUserMap = null;
 	ServerSocket listener = null;
 	
 	
-	public TCP_Welcome_Thread(HashMap<Integer, String> ckToUsr)
+	public TCP_Welcome_Thread(HashMap<Integer, User> ckToUsr)
 	{
 		cookieToUserMap = ckToUsr;
 	}

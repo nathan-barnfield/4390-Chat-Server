@@ -10,14 +10,18 @@ import javax.crypto.*;
 public class Server {
 	private static Hashtable userDB = new Hashtable<>();
 	private static String userDBfile = "DB.txt";
+	public static Hashtable activeUsers = new Hashtable<>();
 	private KeyGenerator keygenerator;
 	private static SecretKey myDesKey;
 	private static Cipher dCipher;
+	public static TCP_Welcome_Thread TCPWelcome;
 	public Server() throws IOException{
 		loadDB(userDBfile);
 		printDB();
 		UDP_Handshake handshake = new UDP_Handshake("test?");
 		handshake.start();
+		TCPWelcome = new TCP_Welcome_Thread(new HashMap<Integer,User>());
+		TCPWelcome.start();
 	}
 
 

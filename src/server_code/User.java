@@ -17,6 +17,14 @@ public class User
 		//Enter offline state
 	}
 	
+	public PrintWriter getOut() {
+		return out;
+	}
+
+	public void setOut(PrintWriter out) {
+		this.out = out;
+	}
+
 	private void Offline()
 	{
 		//User input loop

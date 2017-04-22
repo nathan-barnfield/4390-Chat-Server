@@ -25,10 +25,7 @@ public class Outgoing_Thread extends Thread
 			{
 				User recieveUser = onlineUsers.get(currentMess.getRecieveingUser());
 			
-				switch(currentMess.getMessageType())
-				{
-				case "":
-				}
+				recieveUser.getOut().println(currentMess.getData());
 			}
 		}
 	}

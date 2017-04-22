@@ -59,7 +59,7 @@ public class Reciever_Thread extends Thread
 			
 			String inMess = null;
 			
-			//while connected parse messages as they are sent
+
 			while(true)
 			{
 				
@@ -79,6 +79,7 @@ public class Reciever_Thread extends Thread
 										break;
 				case "HISTORY_REQ":		
 										break;
+
 				
 				}
 				

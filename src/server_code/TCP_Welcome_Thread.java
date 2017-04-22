@@ -7,7 +7,8 @@ import java.util.*;
 public class TCP_Welcome_Thread extends Thread
 {
 	
-	HashMap<Integer, User> cookieToUserMap = null;
+	public static HashMap<Integer, User> cookieToUserMap = null;
+
 	ServerSocket listener = null;
 	
 	

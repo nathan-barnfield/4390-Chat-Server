@@ -1,5 +1,68 @@
 package server_code;
 
-public class Reciever_Thread {
+import java.io.*;
 
+import java.net.*;
+import java.util.HashMap;
+
+public class Reciever_Thread extends Thread
+{
+		Socket socket = null;
+		BufferedReader in = null;
+		PrintWriter out = null;
+		HashMap<Integer, User> cookieToUserMap = null;
+		User user = null;
+		
+		public Reciever_Thread(Socket connection,HashMap<Integer, User> cookieToUserMap2)
+		{
+			socket = connection;
+			cookieToUserMap = cookieToUserMap2;
+		}
+		
+		public void run()
+		{
+			try {in = new BufferedReader(new InputStreamReader(socket.getInputStream()));} 	catch (IOException e) {System.out.println("In TCP_Welcome_Thread: Unable to create Buffered Reader");e.printStackTrace();}
+			try {out = new PrintWriter(socket.getOutputStream(), true);} 					catch (IOException e) {System.out.println("In TCP_Welcome_Thread: unable to create PrintWriter");e.printStackTrace();}
+			 
+			String cookie = null;
+			 
+			try {cookie = in.readLine();} catch (IOException e) {System.out.println("In Reciever Thread: Unable to retrieve transmissions from: " + socket.getInetAddress().toString());e.printStackTrace();}
+			 
+			if(cookieToUserMap.containsKey(Integer.parseInt(cookie)))
+				{
+					User name = cookieToUserMap.get(Integer.parseInt(cookie));
+				}
+			else
+				{
+					out.println("CONNECTION REFUSED");
+				
+					out.close();
+				
+					try {in.close();} catch (IOException e) {System.out.println("In Reciever_Thread: Could not close In BufferedReader");e.printStackTrace();}
+				
+					try {socket.close();} catch (IOException e) {System.out.println("in Reciever_Thread: Could not close socket : " + socket.getInetAddress().toString());e.printStackTrace();}
+				
+					return;
+				}
+			
+			String inMess = null;
+			
+			while(true)
+			{
+				
+				try {inMess = in.readLine();} catch (IOException e) {System.out.println("In Reciever_thread: unable to recieve inMess transmission from: " + socket.getInetAddress().toString()); e.printStackTrace();}
+				
+				String[] mess = inMess.split(",");
+				
+				
+				switch(mess[0])
+				{
+				
+				}
+				
+			}
+			
+			
+		}
+		
 }

@@ -4,20 +4,42 @@ import java.io.*;
 
 import java.net.*;
 import java.util.HashMap;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Semaphore;
 
 public class Reciever_Thread extends Thread
 {
-		Socket socket = null;
-		BufferedReader in = null;
-		PrintWriter out = null;
-		HashMap<Integer, User> cookieToUserMap = null;
-		User user = null;
+		private String						thisThreadsUser	= null;
+		private Socket 						socket 			= null;
+		private BufferedReader 				in 				= null;
+		private PrintWriter 				out 			= null;
+		private HashMap<Integer, User> 		cookieToUserMap = null;
+		private HashMap<String, User> 		onlineUsers 	= null;
+		private HashMap<String, Semaphore> 	userSemaphores 	= null;
+		private User 						user 			= null;
+		private BlockingQueue<Message> 		outMessages		= null;
+		private String						currentSessID	= null;
+		private Semaphore					sessIDSema		= null;
 		
-		public Reciever_Thread(Socket connection,HashMap<Integer, User> ckToUsr)
+		public Reciever_Thread	(	Socket 						connection,
+									HashMap<Integer, User> 		ckToUsr,
+									HashMap<String,User> 		activeUsers,
+									HashMap<String,Semaphore> 	usrSem,
+									BlockingQueue<Message> 		outMess,
+									String 						sessID,
+									Semaphore					sessIDSem
+								)
 		{
-			socket = connection;
-			cookieToUserMap = ckToUsr;
+			socket 			= 	connection;
+			cookieToUserMap = 	ckToUsr;
+			onlineUsers 	= 	activeUsers;
+			userSemaphores 	= 	usrSem;
+			outMessages 	= 	outMess;
+			currentSessID	=	sessID;
+			sessIDSema		=	sessIDSem;
 		}
+		
+		
 		
 		public void run()
 		{
@@ -38,6 +60,7 @@ public class Reciever_Thread extends Thread
 				{
 					User thisUser = cookieToUserMap.get(Integer.parseInt(connMessParts[1]));
 					cookieToUserMap.remove(connMessParts[1]);
+					thisThreadsUser = thisUser.getUserID();
 					//User is created in handhsake, change this to retrieving from the hashtable instead
 					user = new User(name, out);
 					out.println("CONNECTED");
@@ -71,8 +94,72 @@ public class Reciever_Thread extends Thread
 				
 				switch(mess[0])
 				{
-				case "CHAT_REQUEST":	
+				case "CHAT_REQUEST":	if(onlineUsers.containsKey(mess[1]))
+											{
+												userSemaphores.get(mess[1]).acquire();
+												if(onlineUsers.get(mess[1]).isReachable())
+												{
+													userSemaphores	.get(thisThreadsUser)	.acquire();
+													//Set both users to unreachable while they are in a chat session
+													onlineUsers		.get(mess[1])			.setReachable(false);
+													onlineUsers		.get(thisThreadsUser)	.setReachable(false);
+													//Set both user's current session ID to the available session ID, then increment the session ID
+													sessIDSema		.acquire();
+													onlineUsers		.get(mess[1])			.setCurrentSessID(currentSessID);
+													onlineUsers		.get(thisThreadsUser)	.setCurrentSessID(currentSessID);
+													incrementSessID();
+													sessIDSema		.release();
+													
+													//Send the CHAT_STARTED messages to both clients
+													outMessages.put(new Message(	"CHAT_STARTED",
+																					mess[1],
+																					thisThreadsUser,
+																					"CHAT_STARTED\u001e" 
+																					+ onlineUsers.get(thisThreadsUser).getCurrentSessID() 
+																					+ "\u001e" 
+																					+ thisThreadsUser 
+																				)
+																	);
+													
+													outMessages.put(new Message(	"CHAT_STARTED",
+																					thisThreadsUser,
+																					mess[1],
+																					"CHAT_STARTED\u001e" 
+																					+ onlineUsers.get(thisThreadsUser).getCurrentSessID() 
+																					+ "\u001e" 
+																					+ mess[1] 
+																				)
+																	);
+													
+													
+													userSemaphores	.get(mess[1])			.release();
+													userSemaphores	.get(thisThreadsUser)	.release();
+												}
+												else
+												{
+													//Notify the client that the client they are trying to reach is unavailable
+													userSemaphores.get(mess[1]).release();
+													
+													outMessages.put(new Message(	"UNREACHABLE",
+																					thisThreadsUser,
+																					"SERVER",
+																					"UNREACHABLE\u001e" + mess[1] 
+																				)
+																	);												
+												}
+											}
+											else
+											{
+												//Notify the client that the client they are trying to reach is not online
+												outMessages.put(new Message(	"UNREACHABLE",
+																				thisThreadsUser,
+																				"SERVER",
+																				"UNREACHABLE\u001e" + mess[1] 
+																			)
+																);
+											}
 										break;
+										
 				case "END_REQUEST":		
 										break;
 				case "CHAT":			
@@ -85,6 +172,13 @@ public class Reciever_Thread extends Thread
 			}
 			
 			
+		}
+		
+		private void incrementSessID()
+		{
+			//try {sessIDSema.acquire();} catch (InterruptedException e) {"In Reciever_Thread incrementSessID function: Could not acquire session ID semaphore"); e.printStackTrace();}
+			String newSessID = Integer.toString(Integer.parseInt(currentSessID) + 1);
+			currentSessID = newSessID;
 		}
 		
 }

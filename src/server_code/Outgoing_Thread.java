@@ -6,9 +6,10 @@ import java.util.concurrent.BlockingQueue;
 public class Outgoing_Thread extends Thread
 {
 	BlockingQueue<Message> outgoingQueue = null;
-	Hashtable<String,User> onlineUsers = null;
+	HashMap<String,User> onlineUsers = null;
+	HashMap<String, Semaphore> userSemaphores = null;
 	
-	public Outgoing_Thread(BlockingQueue<Message> outQueue, Hashtable<String,User> userTable)
+	public Outgoing_Thread(BlockingQueue<Message> outQueue, HashMap<String,User> userTable, HashMap<String,Semaphore> userSemMap)
 	{
 		outgoingQueue = outQueue;
 		onlineUsers = userTable;
@@ -23,9 +24,14 @@ public class Outgoing_Thread extends Thread
 			
 			if(onlineUsers.contains(currentMess.getRecieveingUser()))
 			{
+				//Acquire the semaphore for the user that is about to be retrieved
+				try { userSemaphores.get(currentMess.getRecieveingUser()).acquire();} catch (InterruptedException e) {System.out.println("in Outgoing_Thread: Could not acquire User\"" + currentMess.getRecieveingUser()+"\"'s mutex");e.printStackTrace();}
+				
 				User recieveUser = onlineUsers.get(currentMess.getRecieveingUser());
 			
 				recieveUser.getOut().println(currentMess.getData());
+				
+				userSemaphores.get(currentMess.getRecieveingUser()).release();
 			}
 		}
 	}

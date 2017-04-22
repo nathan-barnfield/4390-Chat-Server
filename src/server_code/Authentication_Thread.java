@@ -111,7 +111,7 @@ public class Authentication_Thread extends Thread
 					
 					Server.activeUsers.put(helloUsername, newuser); //Store in activeUsers
 					TCP_Welcome_Thread.cookieToUserMap.put(32, newuser); //Store in cookieToUserMap
-					packet = Packet_Helpers.stringToPacket("AUTH_SUCC", IpAddress, port);
+					packet = Packet_Helpers.stringToPacket("32", IpAddress, port);
 					try {
 						socket.send(packet);
 					} catch (IOException e) {

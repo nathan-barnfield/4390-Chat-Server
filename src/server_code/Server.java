@@ -4,6 +4,7 @@ package server_code;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 import java.io.*;
 import java.net.DatagramPacket;
 
@@ -19,7 +20,11 @@ public class Server {
 	private static SecretKey myDesKey;
 	private static Cipher dCipher;
 	public static TCP_Welcome_Thread TCPWelcome;
+	//The queue for outgoing messages.
 	private static BlockingQueue<Message> messageQueue = new LinkedBlockingQueue<Message>();
+	//Hashmap that stores each users mutex so that no thread contentions occur
+	private static HashMap<String, Semaphore> userSemaphores = new HashMap<String, Semaphore>();
+
 	
 	public Server() throws IOException{
 		loadDB(userDBfile);

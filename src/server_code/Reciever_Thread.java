@@ -10,10 +10,10 @@ public class Reciever_Thread extends Thread
 		Socket socket = null;
 		BufferedReader in = null;
 		PrintWriter out = null;
-		HashMap<Integer, String> cookieToUserMap = null;
+		HashMap<Integer, User> cookieToUserMap = null;
 		User user = null;
 		
-		public Reciever_Thread(Socket connection,HashMap<Integer, String> ckToUsr)
+		public Reciever_Thread(Socket connection,HashMap<Integer, User> ckToUsr)
 		{
 			socket = connection;
 			cookieToUserMap = ckToUsr;
@@ -36,8 +36,9 @@ public class Reciever_Thread extends Thread
 			//If the message is a CONNECT request and the cookie passed is in  the cookie-user hashmap, then create a new user and send a connected message to the client
 			if(connMessParts[0].equals("CONNECT") && cookieToUserMap.containsKey(Integer.parseInt(connMessParts[1])))
 				{
-					String name = cookieToUserMap.get(Integer.parseInt(connMessParts[1]));
+					User thisUser = cookieToUserMap.get(Integer.parseInt(connMessParts[1]));
 					cookieToUserMap.remove(connMessParts[1]);
+					//User is created in handhsake, change this to retrieving from the hashtable instead
 					user = new User(name, out);
 					out.println("CONNECTED");
 					//onlinehashMap.put(user);

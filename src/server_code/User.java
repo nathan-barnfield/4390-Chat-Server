@@ -4,18 +4,54 @@ import java.io.PrintWriter;
 
 public class User 
 {
-	String userID;
-	int keyValue;
-	PrintWriter out = null;
-	BouncyEncryption encryptor= null;
+	private String 				userID;
+	private int 				keyValue;
+	private PrintWriter 		out 			= 	null;
+	private BouncyEncryption 	encryptor		= 	null;
+	private boolean 			isReachable 	= 	false;
+	private String				currentSessID	= 	null;
 	
 	
+	
+
 	public User(String name, PrintWriter printer)
 	{
 		//Read file for userID and key
 		userID = name;
 		out = printer;
 		//Enter offline state
+	}
+	
+	public PrintWriter getOut() {
+		return out;
+	}
+
+	public void setOut(PrintWriter out) {
+		this.out = out;
+	}
+	
+	public boolean isReachable() {
+		return isReachable;
+	}
+
+	public void setReachable(boolean isReachable) {
+		this.isReachable = isReachable;
+	}
+
+	public String getUserID() {
+		return userID;
+	}
+
+	public void setUserID(String userID) {
+		this.userID = userID;
+	}
+
+	public String getCurrentSessID() {
+		return currentSessID;
+	}
+
+	public void setCurrentSessID(String currentSessID) {
+		this.currentSessID = currentSessID;
 	}
 	
 	private void Offline()
@@ -57,4 +93,5 @@ public class User
 		
 	}
 }
+
 

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Semaphore;
 
-public class Reciever_Thread extends Thread
+public class Reciever_Thread extends Thread 
 {
 		private String						thisThreadsUser	= null;
 		private Socket 						socket 			= null;
@@ -95,40 +95,65 @@ public class Reciever_Thread extends Thread
 				{
 				case "CHAT_REQUEST":	if(onlineUsers.containsKey(mess[1]))
 											{
-												userSemaphores.get(mess[1]).acquire();
+												try {
+													userSemaphores.get(mess[1]).acquire();
+												} catch (InterruptedException e) {
+													// TODO Auto-generated catch block
+													e.printStackTrace();
+												}
 												if(onlineUsers.get(mess[1]).isReachable())
 												{
-													userSemaphores	.get(thisThreadsUser)	.acquire();
+													try {
+														userSemaphores	.get(thisThreadsUser)	.acquire();
+													} catch (InterruptedException e) {
+														// TODO Auto-generated catch block
+														e.printStackTrace();
+													}
 													//Set both users to unreachable while they are in a chat session
 													onlineUsers		.get(mess[1])			.setReachable(false);
 													onlineUsers		.get(thisThreadsUser)	.setReachable(false);
 													//Set both user's current session ID to the available session ID, then increment the session ID
-													sessIDSema		.acquire();
+													try {
+														sessIDSema		.acquire();
+													} catch (InterruptedException e) {
+														// TODO Auto-generated catch block
+														e.printStackTrace();
+													}
 													onlineUsers		.get(mess[1])			.setCurrentSessID(currentSessID);
 													onlineUsers		.get(thisThreadsUser)	.setCurrentSessID(currentSessID);
 													incrementSessID();
 													sessIDSema		.release();
 													
 													//Send the CHAT_STARTED messages to both clients
-													outMessages.put(new Message(	"CHAT_STARTED",
-																					mess[1],
-																					thisThreadsUser,
-																					"CHAT_STARTED\u001e" 
-																					+ onlineUsers.get(thisThreadsUser).getCurrentSessID() 
-																					+ "\u001e" 
-																					+ thisThreadsUser 
-																				)
-																	);
+													try {
+														outMessages.put(new Message(	"CHAT_STARTED",
+																						mess[1],
+																						thisThreadsUser,
+																						"CHAT_STARTED\u001e" 
+																						+ onlineUsers.get(thisThreadsUser).getCurrentSessID() 
+																						+ "\u001e" 
+																						+ thisThreadsUser 
+																					)
+																		);
+													} catch (InterruptedException e) {
+														// TODO Auto-generated catch block
+														e.printStackTrace();
+													}
 													
-													outMessages.put(new Message(	"CHAT_STARTED",
-																					thisThreadsUser,
-																					mess[1],
-																					"CHAT_STARTED\u001e" 
-																					+ onlineUsers.get(thisThreadsUser).getCurrentSessID() 
-																					+ "\u001e" 
-																					+ mess[1] 
-																				)
-																	);
+													try {
+														outMessages.put(new Message(	"CHAT_STARTED",
+																						thisThreadsUser,
+																						mess[1],
+																						"CHAT_STARTED\u001e" 
+																						+ onlineUsers.get(thisThreadsUser).getCurrentSessID() 
+																						+ "\u001e" 
+																						+ mess[1] 
+																					)
+																		);
+													} catch (InterruptedException e) {
+														// TODO Auto-generated catch block
+														e.printStackTrace();
+													}
 													
 													
 													userSemaphores	.get(mess[1])			.release();
@@ -139,23 +164,33 @@ public class Reciever_Thread extends Thread
 													//Notify the client that the client they are trying to reach is unavailable
 													userSemaphores.get(mess[1]).release();
 													
-													outMessages.put(new Message(	"UNREACHABLE",
-																					thisThreadsUser,
-																					"SERVER",
-																					"UNREACHABLE\u001e" + mess[1] 
-																				)
-																	);												
+													try {
+														outMessages.put(new Message(	"UNREACHABLE",
+																						thisThreadsUser,
+																						"SERVER",
+																						"UNREACHABLE\u001e" + mess[1] 
+																					)
+																		);
+													} catch (InterruptedException e) {
+														// TODO Auto-generated catch block
+														e.printStackTrace();
+													}												
 												}
 											}
 											else
 											{
 												//Notify the client that the client they are trying to reach is not online
-												outMessages.put(new Message(	"UNREACHABLE",
-																				thisThreadsUser,
-																				"SERVER",
-																				"UNREACHABLE\u001e" + mess[1] 
-																			)
-																);
+												try {
+													outMessages.put(new Message(	"UNREACHABLE",
+																					thisThreadsUser,
+																					"SERVER",
+																					"UNREACHABLE\u001e" + mess[1] 
+																				)
+																	);
+												} catch (InterruptedException e) {
+													// TODO Auto-generated catch block
+													e.printStackTrace();
+												}
 											}
 										break;
 										

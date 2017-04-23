@@ -31,7 +31,7 @@ public class TCP_Welcome_Thread extends Thread
 				
 				try {temp = listener.accept();} catch (IOException e) {System.out.println("In TCP_Welcome_Thread: Failed to accept connection from open socket");e.printStackTrace();}
 				
-				new Reciever_Thread(temp, cookieToUserMap).start();
+				new Reciever_Thread(temp, cookieToUserMap, null, null, null, null, null).start();
 				
 			}
 		} catch (IOException e) {System.out.println("Failed to Initiate TCP Welcome Socket");e.printStackTrace();}

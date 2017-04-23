@@ -26,7 +26,7 @@ public class Outgoing_Thread extends Thread
 			
 			if(onlineUsers.containsKey(currentMess.getRecieveingUser()))
 			{
-				userSemaphores.get(key)
+				userSemaphores.get(currentMess.getRecieveingUser());
 				User recieveUser = onlineUsers.get(currentMess.getRecieveingUser());
 			
 				switch(currentMess.getMessageType())

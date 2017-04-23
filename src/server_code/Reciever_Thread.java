@@ -16,7 +16,7 @@ public class Reciever_Thread extends Thread
 		public Reciever_Thread(Socket connection,HashMap<Integer, User> ckToUsr)
 		{
 			socket = connection;
-			cookieToUserMap = cookieToUserMap2;
+			cookieToUserMap = ckToUsr;
 		}
 		
 		public void run()
@@ -39,7 +39,7 @@ public class Reciever_Thread extends Thread
 					User thisUser = cookieToUserMap.get(Integer.parseInt(connMessParts[1]));
 					cookieToUserMap.remove(connMessParts[1]);
 					//User is created in handhsake, change this to retrieving from the hashtable instead
-					user = new User(name, out);
+					Server.activeUsers.get(thisUser.userID);
 					out.println("CONNECTED");
 					//onlinehashMap.put(user);
 				}

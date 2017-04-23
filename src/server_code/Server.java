@@ -205,7 +205,7 @@ public class Server {
 	//Hashmap that stores each users mutex so that no thread contentions occur
 	private static HashMap<String, Semaphore> userSemaphores = new HashMap<String, Semaphore>();
 	private static String currentChatSess = null;
-	private static Semaphore sessIDSem	  = new Semaphore(1);
+	private static Semaphore sessIDSem	  = new Semaphore(1);		private static Semaphore usrSemHashSemaphore = new Semaphore(1);		private static Semaphore onlineUsersSemaphore = new Semaphore(1);
 
 	
 	public Server() throws IOException{

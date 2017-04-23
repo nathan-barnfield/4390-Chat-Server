@@ -11,12 +11,15 @@ public class Message
 	//The data needed to be sent
 	String data = null;
 	
-	public Message(String messType, String recieveUser, String sendUser, String messData)
+	String sessionID = null;
+	
+	public Message(String messType, String recieveUser, String sendUser, String messData, String sessID)
 	{
 		messageType = messType;
 		recieveingUser = recieveUser;
 		sendingUser = sendUser;
 		data = messData;
+		sessionID = sessID;
 	}
 	
 	

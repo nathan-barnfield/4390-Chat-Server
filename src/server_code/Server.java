@@ -24,7 +24,7 @@ public class Server {
 	//Hashmap that stores each users mutex so that no thread contentions occur
 	private static HashMap<String, Semaphore> userSemaphores = new HashMap<String, Semaphore>();
 	private static String currentChatSess = null;
-	private static Semaphore sessIDSem	  = new Semaphore(1);
+	private static Semaphore sessIDSem	  = new Semaphore(1);		public static Archival_Thread archiver;
 
 	
 	public Server() throws IOException{
@@ -33,7 +33,7 @@ public class Server {
 		UDP_Handshake handshake = new UDP_Handshake("test?");
 		handshake.start();
 		TCPWelcome = new TCP_Welcome_Thread(new HashMap<Integer,User>());
-		TCPWelcome.start();		Archival_Thread archiver = new Archival_Thread();		archiver.start();				try {			archiver.archive(new Message(null, "UserA", "UserB", "TestMessage1", "0001"));			archiver.archive(new Message(null, "UserB", "UserA", "TestMessage2", "0001"));			archiver.archive(new Message(null, "UserA", "UserB", "TestMessage3", "0001"));						archiver.archive(new Message(null, "UserC", "UserA", "TestMessage4", "0002"));			archiver.archive(new Message(null, "UserA", "UserC", "TestMessage5", "0002"));		} catch (InterruptedException e) {			// TODO Auto-generated catch block			e.printStackTrace();		}				
+		TCPWelcome.start();		Archival_Thread archiver = new Archival_Thread();		archiver.start();		
 	}
 
 

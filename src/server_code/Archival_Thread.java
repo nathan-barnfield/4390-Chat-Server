@@ -65,7 +65,7 @@ public class Archival_Thread extends Thread {
 
 		 //Check if a session for the message exists already
 		 //If so, append the message to the session file
-		 String filename = "logs/"+firstUser+"."+secondUser+"."+sessionId;
+		 String filename = "logs/"+firstUser+"."+secondUser;
 		 FileWriter writer = new FileWriter(filename, true);
 		 
 		 String dataoutput = "<"+sessionId+">" + " " + msg.sendingUser + ": " + message + "\n";

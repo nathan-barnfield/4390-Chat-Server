@@ -23,6 +23,9 @@ public class Reciever_Thread extends Thread
 		private Semaphore					usrSemHashSemaphore = null;
 		private Semaphore					onlineUsrSemaphore	= null;
 		private Semaphore					ckToUsrSemaphore	= null;
+		private BlockingQueue<Message>		messageArchiveQueue = null;
+		private Semaphore					archivalSemaphore	= new Semaphore(1);
+	//	private BlockingQueue<HistMessage>	historyReqQueue		= null;
 		
 		
 		public Reciever_Thread	(	Socket 						connection,
@@ -34,7 +37,8 @@ public class Reciever_Thread extends Thread
 									Semaphore					sessIDSem,
 									Semaphore					usrSemHashSema,
 									Semaphore					onlineUsrSema,
-									Semaphore					ckToUsrSema
+									Semaphore					ckToUsrSema,
+									BlockingQueue<Message>		messArchQueue
 								)
 		{
 			socket 				= 	connection;
@@ -44,9 +48,10 @@ public class Reciever_Thread extends Thread
 			outMessages 		= 	outMess;
 			currentSessID		=	sessID;
 			sessIDSema			=	sessIDSem;
-			usrSemHashSemaphore = usrSemHashSema;
-			onlineUsrSemaphore 	= onlineUsrSema;
+			usrSemHashSemaphore = 	usrSemHashSema;
+			onlineUsrSemaphore 	= 	onlineUsrSema;
 			ckToUsrSemaphore	=	ckToUsrSema;
+			messageArchiveQueue	=	messArchQueue;
 		}
 		
 		
@@ -242,8 +247,23 @@ public class Reciever_Thread extends Thread
 										usrSemHashSemaphore	.release();
 										
 										break;
-				case "CHAT":			
+										
+				case "CHAT":			if(mess[1].equals(thisThreadsUser.getCurrentSessID()))
+											{
+												try {outMessages.put(new Message("CHAT",
+																				thisThreadsUser.getChatPartner(),
+																				thisThreadsUser.getUserID(),
+																				"CHAT\u001e" + thisThreadsUser.getCurrentSessID() + "\u001e" + mess[2],
+																				null));} catch (InterruptedException e) {e.printStackTrace();}	
+												
+												try {messageArchiveQueue.put(new Message("CHAT",
+																					thisThreadsUser.getChatPartner(),
+																					thisThreadsUser.getUserID(),
+																					mess[2],
+																					thisThreadsUser.getCurrentSessID()));} catch (InterruptedException e) {e.printStackTrace();}
+											}
 										break;
+										
 				case "HISTORY_REQ":		
 										break;
 				

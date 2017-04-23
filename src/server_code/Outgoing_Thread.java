@@ -1,9 +1,9 @@
 package server_code;
 
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Semaphore;
+import java.util.*;
 
 public class Outgoing_Thread extends Thread
 {
@@ -24,7 +24,7 @@ public class Outgoing_Thread extends Thread
 			Message currentMess = null;
 			try { currentMess = outgoingQueue.take();} catch (InterruptedException e) {System.out.println("In Outgoing_Thread:Could not retrieve message from outgoing queue");e.printStackTrace();}
 			
-			if(onlineUsers.containsValue(currentMess.getRecieveingUser()))
+			if(onlineUsers.containsKey(currentMess.getRecieveingUser()))
 			{
 				//Acquire the semaphore for the user that is about to be retrieved
 				try { userSemaphores.get(currentMess.getRecieveingUser()).acquire();} catch (InterruptedException e) {System.out.println("in Outgoing_Thread: Could not acquire User\"" + currentMess.getRecieveingUser()+"\"'s mutex");e.printStackTrace();}

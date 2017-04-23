@@ -9,17 +9,24 @@ import java.util.concurrent.Semaphore;
 
 public class Reciever_Thread extends Thread 
 {
-		private String						thisThreadsUser	= null;
-		private Socket 						socket 			= null;
-		private BufferedReader 				in 				= null;
-		private PrintWriter 				out 			= null;
-		private HashMap<Integer, User> 		cookieToUserMap = null;
-		private HashMap<String, User> 		onlineUsers 	= null;
-		private HashMap<String, Semaphore> 	userSemaphores 	= null;
-		private User 						user 			= null;
-		private BlockingQueue<Message> 		outMessages		= null;
-		private String						currentSessID	= null;
-		private Semaphore					sessIDSema		= null;
+		private User						thisThreadsUser		= null;
+		private Socket 						socket 				= null;
+		private BufferedReader 				in 					= null;
+		private PrintWriter 				out 				= null;
+		private HashMap<Integer, User> 		cookieToUserMap		= null;
+		private HashMap<String, User> 		onlineUsers 		= null;
+		private HashMap<String, Semaphore> 	userSemaphores 		= null;
+		private User 						user 				= null;
+		private BlockingQueue<Message> 		outMessages			= null;
+		private String						currentSessID		= null;
+		private Semaphore					sessIDSema			= null;
+		private Semaphore					usrSemHashSemaphore = null;
+		private Semaphore					onlineUsrSemaphore	= null;
+		private Semaphore					ckToUsrSemaphore	= null;
+		private BlockingQueue<Message>		messageArchiveQueue = null;
+		private Semaphore					archivalSemaphore	= new Semaphore(1);
+	//	private BlockingQueue<HistMessage>	historyReqQueue		= null;
+		
 		
 		public Reciever_Thread	(	Socket 						connection,
 									HashMap<Integer, User> 		ckToUsr,
@@ -27,16 +34,24 @@ public class Reciever_Thread extends Thread
 									HashMap<String,Semaphore> 	usrSem,
 									BlockingQueue<Message> 		outMess,
 									String 						sessID,
-									Semaphore					sessIDSem
+									Semaphore					sessIDSem,
+									Semaphore					usrSemHashSema,
+									Semaphore					onlineUsrSema,
+									Semaphore					ckToUsrSema,
+									BlockingQueue<Message>		messArchQueue
 								)
 		{
-			socket 			= 	connection;
-			cookieToUserMap = 	ckToUsr;
-			onlineUsers 	= 	activeUsers;
-			userSemaphores 	= 	usrSem;
-			outMessages 	= 	outMess;
-			currentSessID	=	sessID;
-			sessIDSema		=	sessIDSem;
+			socket 				= 	connection;
+			cookieToUserMap	 	= 	ckToUsr;
+			onlineUsers 		= 	activeUsers;
+			userSemaphores 		= 	usrSem;
+			outMessages 		= 	outMess;
+			currentSessID		=	sessID;
+			sessIDSema			=	sessIDSem;
+			usrSemHashSemaphore = 	usrSemHashSema;
+			onlineUsrSemaphore 	= 	onlineUsrSema;
+			ckToUsrSemaphore	=	ckToUsrSema;
+			messageArchiveQueue	=	messArchQueue;
 		}
 		
 		
@@ -53,14 +68,32 @@ public class Reciever_Thread extends Thread
 			try {connMess = in.readLine();} catch (IOException e) {System.out.println("In Reciever Thread: Unable to retrieve transmissions from: " + socket.getInetAddress().toString());e.printStackTrace();}
 			
 			//Parse the first message ( All messages are comma delimeted)
-			String[] connMessParts = connMess.split(",");
+			String[] connMessParts = connMess.split("\u001e");
 			
 			//If the message is a CONNECT request and the cookie passed is in  the cookie-user hashmap, then create a new user and send a connected message to the client
 			if(connMessParts[0].equals("CONNECT") && cookieToUserMap.containsKey(Integer.parseInt(connMessParts[1])))
 				{
-					User thisUser = cookieToUserMap.get(Integer.parseInt(connMessParts[1]));
-					cookieToUserMap.remove(connMessParts[1]);
-					thisThreadsUser = thisUser.getUserID();
+					try {ckToUsrSemaphore.acquire();} catch (InterruptedException e) {e.printStackTrace();}
+					
+					//Retrieve the User by using the cookie as the index into the hasmap. Remove hte User once they are retrieved
+					User thisUser = cookieToUserMap	.get(Integer.parseInt(connMessParts[1]));
+					cookieToUserMap					.remove(connMessParts[1]);
+					ckToUsrSemaphore				.release();
+					
+					//initiate the User with prerequisite information
+					thisThreadsUser = thisUser;
+					thisUser.setOut(out);
+					thisUser.setReachable(true);
+					
+					try {usrSemHashSemaphore	.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}
+					userSemaphores				.put(thisUser.getUserID(), new Semaphore(1));
+					usrSemHashSemaphore			.release();
+					
+					//Place the User into the online Users hashmap
+					try {onlineUsrSemaphore	.acquire();} catch (InterruptedException e) {e.printStackTrace();}
+					onlineUsers				.put(thisUser.getUserID(), thisUser);
+					onlineUsrSemaphore		.release();
+					
 					//User is created in handhsake, change this to retrieving from the hashtable instead
 					out.println("CONNECTED");
 					//onlinehashMap.put(user);
@@ -90,114 +123,147 @@ public class Reciever_Thread extends Thread
 				String[] mess = inMess.split(",");
 				
 				
-				
 				switch(mess[0])
 				{
-				case "CHAT_REQUEST":	if(onlineUsers.containsKey(mess[1]))
+				case "CHAT_REQUEST":	try {onlineUsrSemaphore.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}	
+				
+										if(onlineUsers.containsKey(mess[1]))
 											{
-												try {
-													userSemaphores.get(mess[1]).acquire();
-												} catch (InterruptedException e) {
-													// TODO Auto-generated catch block
-													e.printStackTrace();
-												}
+												try {usrSemHashSemaphore.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}
+												try { userSemaphores.get(mess[1]).acquire();} catch (InterruptedException e) {e.printStackTrace();}
+												usrSemHashSemaphore.release();
+												
 												if(onlineUsers.get(mess[1]).isReachable())
 												{
-													try {
-														userSemaphores	.get(thisThreadsUser)	.acquire();
-													} catch (InterruptedException e) {
-														// TODO Auto-generated catch block
-														e.printStackTrace();
-													}
+													User tempClientB = onlineUsers.get(mess[1]);
+													onlineUsrSemaphore	.release();
+													
+													try {usrSemHashSemaphore.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}
+													try {userSemaphores.get(thisThreadsUser.getUserID()).acquire();} catch (InterruptedException e) {e.printStackTrace();}
+													usrSemHashSemaphore.release();
+													
 													//Set both users to unreachable while they are in a chat session
-													onlineUsers		.get(mess[1])			.setReachable(false);
-													onlineUsers		.get(thisThreadsUser)	.setReachable(false);
+													tempClientB			.setReachable(false);
+													thisThreadsUser		.setReachable(false);
 													//Set both user's current session ID to the available session ID, then increment the session ID
-													try {
-														sessIDSema		.acquire();
-													} catch (InterruptedException e) {
-														// TODO Auto-generated catch block
-														e.printStackTrace();
-													}
-													onlineUsers		.get(mess[1])			.setCurrentSessID(currentSessID);
-													onlineUsers		.get(thisThreadsUser)	.setCurrentSessID(currentSessID);
+													try {sessIDSema.acquire();} catch (InterruptedException e) {e.printStackTrace();}
+													
+													tempClientB			.setCurrentSessID(currentSessID);
+													thisThreadsUser		.setCurrentSessID(currentSessID);
+													tempClientB			.setChatPartner(thisThreadsUser.getChatPartner());
+													thisThreadsUser		.setChatPartner(tempClientB.getUserID());
+													
 													incrementSessID();
-													sessIDSema		.release();
+													sessIDSema			.release();
+													
 													
 													//Send the CHAT_STARTED messages to both clients
-													try {
-														outMessages.put(new Message(	"CHAT_STARTED",
-																						mess[1],
-																						thisThreadsUser,
+													try {outMessages.put(new Message(	"CHAT_STARTED",
+																						tempClientB.getUserID(),
+																						thisThreadsUser.getUserID(),
 																						"CHAT_STARTED\u001e" 
-																						+ onlineUsers.get(thisThreadsUser).getCurrentSessID() 
+																						+ thisThreadsUser.getCurrentSessID() 
 																						+ "\u001e" 
-																						+ thisThreadsUser 
+																						+ thisThreadsUser.getUserID(),
+																						null
 																					)
-																		);
-													} catch (InterruptedException e) {
-														// TODO Auto-generated catch block
-														e.printStackTrace();
-													}
+																		);} catch (InterruptedException e) {e.printStackTrace();}
 													
-													try {
-														outMessages.put(new Message(	"CHAT_STARTED",
-																						thisThreadsUser,
-																						mess[1],
+													try {outMessages.put(new Message(	"CHAT_STARTED",
+																						thisThreadsUser.getUserID(),
+																						tempClientB.getUserID(),
 																						"CHAT_STARTED\u001e" 
-																						+ onlineUsers.get(thisThreadsUser).getCurrentSessID() 
+																						+ thisThreadsUser.getCurrentSessID() 
 																						+ "\u001e" 
-																						+ mess[1] 
+																						+ tempClientB.getUserID(),
+																						null
 																					)
-																		);
-													} catch (InterruptedException e) {
-														// TODO Auto-generated catch block
-														e.printStackTrace();
-													}
+																		);} catch (InterruptedException e) {e.printStackTrace();}
 													
-													
-													userSemaphores	.get(mess[1])			.release();
-													userSemaphores	.get(thisThreadsUser)	.release();
+													try {usrSemHashSemaphore.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}
+													userSemaphores		.get(tempClientB.getUserID())			.release();
+													userSemaphores		.get(thisThreadsUser.getUserID())		.release();
+													usrSemHashSemaphore	.release();
 												}
 												else
 												{
 													//Notify the client that the client they are trying to reach is unavailable
-													userSemaphores.get(mess[1]).release();
-													
+													try {usrSemHashSemaphore.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}
+													userSemaphores		.get(mess[1]).release();
+													usrSemHashSemaphore	.release();
+													onlineUsrSemaphore	.release();
 													try {
 														outMessages.put(new Message(	"UNREACHABLE",
-																						thisThreadsUser,
+																						thisThreadsUser.getUserID(),
 																						"SERVER",
-																						"UNREACHABLE\u001e" + mess[1] 
+																						"UNREACHABLE\u001e" + mess[1],
+																						null
 																					)
 																		);
-													} catch (InterruptedException e) {
-														// TODO Auto-generated catch block
-														e.printStackTrace();
-													}												
+													} catch (InterruptedException e) {e.printStackTrace();}												
 												}
 											}
 											else
 											{
+												onlineUsrSemaphore.release();
+	
 												//Notify the client that the client they are trying to reach is not online
-												try {
-													outMessages.put(new Message(	"UNREACHABLE",
-																					thisThreadsUser,
+												try {outMessages.put(new Message(	"UNREACHABLE",
+																					thisThreadsUser.getUserID(),
 																					"SERVER",
-																					"UNREACHABLE\u001e" + mess[1] 
+																					"UNREACHABLE\u001e" + mess[1],
+																					null
 																				)
 																	);
-												} catch (InterruptedException e) {
-													// TODO Auto-generated catch block
-													e.printStackTrace();
-												}
+												} catch (InterruptedException e) {e.printStackTrace();}
 											}
 										break;
 										
-				case "END_REQUEST":		
+				case "END_REQUEST":		try {usrSemHashSemaphore.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}
+										try { userSemaphores.get(thisThreadsUser.getUserID()).acquire();} catch (InterruptedException e) {e.printStackTrace();}
+										try { userSemaphores.get(thisThreadsUser.getChatPartner()).acquire();} catch (InterruptedException e) {e.printStackTrace();}
+										usrSemHashSemaphore.release();
+										
+										try { outMessages.put(new Message("END_NOTIF",
+																			thisThreadsUser.getChatPartner(),
+																			thisThreadsUser.getUserID(),
+																			"END_NOTIF\u001e" + thisThreadsUser.getCurrentSessID(),
+																			null
+																			));} catch (InterruptedException e) {e.printStackTrace();}
+										try {onlineUsrSemaphore.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}	
+										User tempPartner = onlineUsers.get(thisThreadsUser.getChatPartner());
+										onlineUsrSemaphore.release();
+										
+										tempPartner		.setChatPartner(null);
+										tempPartner		.setCurrentSessID(null);
+										thisThreadsUser	.setChatPartner(null);
+										thisThreadsUser	.setCurrentSessID(null);
+										tempPartner		.setReachable(true);
+										thisThreadsUser	.setReachable(true);
+										
+										try {usrSemHashSemaphore.acquire();} catch (InterruptedException e) {e.printStackTrace();}
+										userSemaphores		.get(thisThreadsUser.getUserID())	.release();
+										userSemaphores		.get(tempPartner.getUserID())		.release();
+										usrSemHashSemaphore	.release();
+										
 										break;
-				case "CHAT":			
+										
+				case "CHAT":			if(mess[1].equals(thisThreadsUser.getCurrentSessID()))
+											{
+												try {outMessages.put(new Message("CHAT",
+																				thisThreadsUser.getChatPartner(),
+																				thisThreadsUser.getUserID(),
+																				"CHAT\u001e" + thisThreadsUser.getCurrentSessID() + "\u001e" + mess[2],
+																				null));} catch (InterruptedException e) {e.printStackTrace();}	
+												
+												try {messageArchiveQueue.put(new Message("CHAT",
+																					thisThreadsUser.getChatPartner(),
+																					thisThreadsUser.getUserID(),
+																					mess[2],
+																					thisThreadsUser.getCurrentSessID()));} catch (InterruptedException e) {e.printStackTrace();}
+											}
 										break;
+										
 				case "HISTORY_REQ":		
 										break;
 				
@@ -216,4 +282,5 @@ public class Reciever_Thread extends Thread
 		}
 		
 }
+
 

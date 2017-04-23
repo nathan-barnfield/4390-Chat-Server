@@ -23,10 +23,8 @@ public class Server {
 	private static BlockingQueue<Message> messageQueue = new LinkedBlockingQueue<Message>();
 	//Hashmap that stores each users mutex so that no thread contentions occur
 	private static HashMap<String, Semaphore> userSemaphores = new HashMap<String, Semaphore>();
-	private static String currentChatSess = null;
-	private static Semaphore sessIDSem	  = new Semaphore(1);		public static Archival_Thread archiver;
-
-	
+	private static String currentChatSess = null;	public static Archival_Thread archiver;
+	private static Semaphore sessIDSem	  = new Semaphore(1);		private static Semaphore usrSemHashSemaphore = new Semaphore(1);		private static Semaphore onlineUsersSemaphore = new Semaphore(1);
 	public Server() throws IOException{
 		loadDB(userDBfile);
 		printDB();

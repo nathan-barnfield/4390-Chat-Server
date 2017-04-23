@@ -62,7 +62,6 @@ public class Reciever_Thread extends Thread
 					cookieToUserMap.remove(connMessParts[1]);
 					thisThreadsUser = thisUser.getUserID();
 					//User is created in handhsake, change this to retrieving from the hashtable instead
-					user = new User(name, out);
 					out.println("CONNECTED");
 					//onlinehashMap.put(user);
 				}

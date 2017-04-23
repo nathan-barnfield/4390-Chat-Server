@@ -7,7 +7,7 @@ public class User
 	private String 				userID;
 	private int 				keyValue;
 	private PrintWriter 		out 			= 	null;
-	private BouncyEncryption 	encryptor		= 	null;
+	public BouncyEncryption 	encryptor		= 	null;
 	private boolean 			isReachable 	= 	false;
 	private String				currentSessID	= 	null;
 	

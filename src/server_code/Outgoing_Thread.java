@@ -24,7 +24,7 @@ public class Outgoing_Thread extends Thread
 			Message currentMess = null;
 			try { currentMess = outgoingQueue.take();} catch (InterruptedException e) {System.out.println("In Outgoing_Thread:Could not retrieve message from outgoing queue");e.printStackTrace();}
 			
-			if(onlineUsers.contains(currentMess.getRecieveingUser()))
+			if(onlineUsers.containsValue(currentMess.getRecieveingUser()))
 			{
 				//Acquire the semaphore for the user that is about to be retrieved
 				try { userSemaphores.get(currentMess.getRecieveingUser()).acquire();} catch (InterruptedException e) {System.out.println("in Outgoing_Thread: Could not acquire User\"" + currentMess.getRecieveingUser()+"\"'s mutex");e.printStackTrace();}

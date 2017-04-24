@@ -140,7 +140,7 @@ public class Authentication_Thread extends Thread
 						packet = null;
 						packet = Packet_Helpers.arrayToPacket(encrypteddata, IpAddress, port);
 					} catch (ShortBufferException e1) {
-						// TODO Auto-generated catch block
+						// TODO Auto-generated catch block							
 						e1.printStackTrace();
 					} catch (IllegalBlockSizeException e1) {
 						// TODO Auto-generated catch block

@@ -24,12 +24,12 @@ public class Server {
 	//Hashmap that stores each users mutex so that no thread contentions occur
 	private static HashMap<String, Semaphore> userSemaphores = new HashMap<String, Semaphore>();
 	private static String currentChatSess = "0";	public static Archival_Thread archiver;
-	private static Semaphore sessIDSem	  = new Semaphore(1);		private static Semaphore usrSemHashSemaphore = new Semaphore(1);		private static Semaphore onlineUsersSemaphore = new Semaphore(1);		private static Semaphore ckToUsrSemapore = new Semaphore(1);		private Reciever_Deps rec_deps = new Reciever_Deps	(															activeUsers,															userSemaphores,															messageQueue,															currentChatSess,															sessIDSem,															usrSemHashSemaphore,															onlineUsersSemaphore,															ckToUsrSemapore														);
+	private static Semaphore sessIDSem	  = new Semaphore(1);		private static Semaphore usrSemHashSemaphore = new Semaphore(1);		private static Semaphore onlineUsersSemaphore = new Semaphore(1);		private static Semaphore ckToUsrSemapore = new Semaphore(1);		private Reciever_Deps rec_deps = null;
 	public Server() throws IOException{
 		loadDB(userDBfile);
 		printDB();
 		UDP_Handshake handshake = new UDP_Handshake("test?");
-		handshake.start();
+		handshake.start();				rec_deps =  new Reciever_Deps	(				activeUsers,				userSemaphores,				messageQueue,				currentChatSess,				sessIDSem,				usrSemHashSemaphore,				onlineUsersSemaphore,				ckToUsrSemapore			);
 		TCPWelcome = new TCP_Welcome_Thread(new HashMap<Integer,User>(), rec_deps);
 		TCPWelcome.start();		Archival_Thread archiver = new Archival_Thread();		archiver.start();		
 	}

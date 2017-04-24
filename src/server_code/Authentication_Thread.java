@@ -133,12 +133,10 @@ public class Authentication_Thread extends Thread
 					Server.activeUsers.put(helloUsername, newuser); //Store in activeUsers
 					int cookie = genAndStoreCookie(newuser);
 					TCP_Welcome_Thread.cookieToUserMap.put(cookie, newuser); //Store in cookieToUserMap
-					
-										
-										
+												
 					try {
 						byte [] encrypteddata = null;
-						encrypteddata = newuser.encryptor.Encrypt(Integer.toString(cookie));
+						encrypteddata = newuser.encryptor.Encrypt(Integer.toString(cookie) + "," + "8888");
 						packet = null;
 						packet = Packet_Helpers.arrayToPacket(encrypteddata, IpAddress, port);
 					} catch (ShortBufferException e1) {

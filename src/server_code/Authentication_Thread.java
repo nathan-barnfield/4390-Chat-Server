@@ -98,7 +98,7 @@ public class Authentication_Thread extends Thread
 				cresponse = Arrays.copyOfRange(cresponse, 0, packet.getLength());
 				if (Arrays.equals(challenge, cresponse))
 				{
-					//Signal that we're ready to establish a TCP connection to the server
+					//Signal that we're ready to establish a TCP connection to the server					User newuser = new User(helloUsername,null);					
 					packet = Packet_Helpers.stringToPacket("AUTH_SUCC", IpAddress, port);
 					try {
 						newuser.encryptor = new BouncyEncryption(rand, secretKey);
@@ -120,7 +120,7 @@ public class Authentication_Thread extends Thread
 						e.printStackTrace();
 					}
 					
-			//		Server.activeUsers.put(helloUsername, newuser); //Store in activeUsers
+					Server.activeUsers.put(helloUsername, newuser); //Store in activeUsers
 					int cookie = genAndStoreCookie(newuser);
 					TCP_Welcome_Thread.cookieToUserMap.put(cookie, newuser); //Store in cookieToUserMap
 					

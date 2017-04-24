@@ -23,12 +23,11 @@ public class Reciever_Thread extends Thread
 		private Semaphore					usrSemHashSemaphore = null;
 		private Semaphore					onlineUsrSemaphore	= null;
 		private Semaphore					ckToUsrSemaphore	= null;
-		private BlockingQueue<Message>		messageArchiveQueue = null;
-		private Semaphore					archivalSemaphore	= new Semaphore(1);
-	//	private BlockingQueue<HistMessage>	historyReqQueue		= null;
 		
 		
-		public Reciever_Thread	(	Socket 						connection,
+		public Reciever_Thread	(	Socket connection, Reciever_Deps deps
+				
+					/*
 									HashMap<Integer, User> 		ckToUsr,
 									HashMap<String,User> 		activeUsers,
 									HashMap<String,Semaphore> 	usrSem,
@@ -39,19 +38,19 @@ public class Reciever_Thread extends Thread
 									Semaphore					onlineUsrSema,
 									Semaphore					ckToUsrSema,
 									BlockingQueue<Message>		messArchQueue
+									*/
 								)
 		{
 			socket 				= 	connection;
-			cookieToUserMap	 	= 	ckToUsr;
-			onlineUsers 		= 	activeUsers;
-			userSemaphores 		= 	usrSem;
-			outMessages 		= 	outMess;
-			currentSessID		=	sessID;
-			sessIDSema			=	sessIDSem;
-			usrSemHashSemaphore = 	usrSemHashSema;
-			onlineUsrSemaphore 	= 	onlineUsrSema;
-			ckToUsrSemaphore	=	ckToUsrSema;
-			messageArchiveQueue	=	messArchQueue;
+			cookieToUserMap	 	=	TCP_Welcome_Thread.cookieToUserMap;
+			onlineUsers 		= 	deps.getOnlineUsers();
+			userSemaphores 		= 	deps.getUserSemaphores();
+			outMessages 		= 	deps.getOutMessages();
+			currentSessID		=	deps.getCurrentSessID();
+			sessIDSema			=	deps.getSessIDSemaphore();
+			usrSemHashSemaphore = 	deps.getUsrSemHashSemaphore();
+			onlineUsrSemaphore 	= 	deps.getOnlineUsrSemaphore();
+			ckToUsrSemaphore	=	deps.getCkToUsrSemaphore();
 		}
 		
 		
@@ -85,14 +84,14 @@ public class Reciever_Thread extends Thread
 					thisUser.setOut(out);
 					thisUser.setReachable(true);
 					
-					try {usrSemHashSemaphore	.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}
-					userSemaphores				.put(thisUser.getUserID(), new Semaphore(1));
-					usrSemHashSemaphore			.release();
+					try {usrSemHashSemaphore		.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}
+					userSemaphores					.put(thisUser.getUserID(), new Semaphore(1));
+					usrSemHashSemaphore				.release();
 					
 					//Place the User into the online Users hashmap
-					try {onlineUsrSemaphore	.acquire();} catch (InterruptedException e) {e.printStackTrace();}
-					onlineUsers				.put(thisUser.getUserID(), thisUser);
-					onlineUsrSemaphore		.release();
+					try {onlineUsrSemaphore			.acquire();} catch (InterruptedException e) {e.printStackTrace();}
+					onlineUsers						.put(thisUser.getUserID(), thisUser);
+					onlineUsrSemaphore				.release();
 					
 					//User is created in handhsake, change this to retrieving from the hashtable instead
 					out.println("CONNECTED");

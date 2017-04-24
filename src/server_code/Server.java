@@ -28,7 +28,7 @@ public class Server {
 	public Server() throws IOException{
 		loadDB(userDBfile);
 		printDB();
-		UDP_Handshake handshake = new UDP_Handshake("test?");
+		UDP_Handshake handshake = new UDP_Handshake("test?");		Outgoing_Thread outThread = new Outgoing_Thread(messageQueue, activeUsers, userSemaphores);				outThread.start();
 		handshake.start();				rec_deps =  new Reciever_Deps	(				activeUsers,				userSemaphores,				messageQueue,				currentChatSess,				sessIDSem,				usrSemHashSemaphore,				onlineUsersSemaphore,				ckToUsrSemapore			);
 		TCPWelcome = new TCP_Welcome_Thread(new HashMap<Integer,User>(), rec_deps);
 		TCPWelcome.start();		Archival_Thread archiver = new Archival_Thread();		archiver.start();		

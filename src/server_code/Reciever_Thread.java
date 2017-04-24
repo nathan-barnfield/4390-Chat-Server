@@ -119,11 +119,11 @@ public class Reciever_Thread extends Thread
 				
 				try {inMess = in.readLine();} catch (IOException e) {System.out.println("In Reciever_thread: unable to recieve inMess transmission from: " + socket.getInetAddress().toString()); e.printStackTrace();}
 				
-				String[] mess = inMess.split(",");
-				
-				
+				String[] mess = inMess.split("\u001e");
+				System.out.println("Recieved Message: " + inMess);
+								
 				switch(mess[0])
-				{
+				{				
 				case "CHAT_REQUEST":	try {onlineUsrSemaphore.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}	
 				
 										if(onlineUsers.containsKey(mess[1]))

@@ -29,14 +29,14 @@ public class Reciever_Deps
 							Semaphore					ckToUsrSema
 						)
 	{
-		onlineUsers 		=	onlineUsers;
-		userSemaphores 		=	userSemaphores;
-		outMessages			=	outMessages;
-		currentSessID		=	currentSessID;
+		onlineUsers 		=	onlineUsrs;
+		userSemaphores 		=	userSema;
+		outMessages			=	outMess;
+		currentSessID		=	curSessID;
 		sessIDSemaphore		=	sessIDSema;
-		usrSemHashSemaphore	=	usrSemHashSemaphore;
-		onlineUsrSemaphore	=	onlineUsrSemaphore;
-		ckToUsrSemaphore	=	ckToUsrSemaphore;
+		usrSemHashSemaphore	=	usrSemHashSema;
+		onlineUsrSemaphore	=	onlineUsrSema;
+		ckToUsrSemaphore	=	ckToUsrSema;
 	}
 
 	public HashMap<String, User> getOnlineUsers() {

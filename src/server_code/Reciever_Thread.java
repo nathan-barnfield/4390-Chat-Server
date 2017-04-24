@@ -255,7 +255,7 @@ public class Reciever_Thread extends Thread
 																				"CHAT\u001e" + thisThreadsUser.getCurrentSessID() + "\u001e" + mess[2],
 																				null));} catch (InterruptedException e) {e.printStackTrace();}	
 												
-												try {messageArchiveQueue.put(new Message("CHAT",
+												try {Archival_Thread.archive(new Message("CHAT",
 																					thisThreadsUser.getChatPartner(),
 																					thisThreadsUser.getUserID(),
 																					mess[2],

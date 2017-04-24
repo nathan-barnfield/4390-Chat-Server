@@ -3,6 +3,12 @@ package server_code;
 import java.util.Hashtable;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Semaphore;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.ShortBufferException;
+
+import java.io.IOException;
 import java.util.*;
 
 public class Outgoing_Thread extends Thread
@@ -32,7 +38,8 @@ public class Outgoing_Thread extends Thread
 				
 				User recieveUser = onlineUsers.get(currentMess.getRecieveingUser());
 			
-				recieveUser.getOut().println(currentMess.getData());
+				try {
+					recieveUser.getOut().println(recieveUser.getEncryptor().Encrypt(currentMess.getData()).toString());} catch (ShortBufferException | IllegalBlockSizeException | BadPaddingException | IOException e) {e.printStackTrace();}
 				
 				userSemaphores.get(currentMess.getRecieveingUser()).release();
 			}

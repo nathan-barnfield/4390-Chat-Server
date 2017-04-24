@@ -5,7 +5,7 @@ import java.io.*;
 import java.net.*;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.Semaphore;import javax.crypto.BadPaddingException;import javax.crypto.IllegalBlockSizeException;import javax.crypto.ShortBufferException;
 
 public class Reciever_Thread extends Thread 
 {
@@ -116,11 +116,10 @@ public class Reciever_Thread extends Thread
 			//while connected parse messages as they are sent
 			while(true)
 			{
-				
-				try {inMess = in.readLine();} catch (IOException e) {System.out.println("In Reciever_thread: unable to recieve inMess transmission from: " + socket.getInetAddress().toString()); e.printStackTrace();}
-				
-				String[] mess = inMess.split("\u001e");
-				System.out.println("Recieved Message: " + inMess);
+				try {inMess = in.readLine();} catch (IOException e) {System.out.println("In Reciever_thread: unable to recieve inMess transmission from: " + socket.getInetAddress().toString()); e.printStackTrace();}				String decryptedMess = null;
+				try {decryptedMess = thisThreadsUser.getEncryptor().Decrypt(inMess.getBytes());} catch (ShortBufferException | IllegalBlockSizeException | BadPaddingException | IOException e2) {e2.printStackTrace();}
+				String[] mess = decryptedMess.split("\u001e");
+				System.out.println("Recieved Message: " + decryptedMess);
 								
 				switch(mess[0])
 				{				

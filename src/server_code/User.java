@@ -65,6 +65,14 @@ public class User
 		this.chatPartner = chatPartner;
 	}
 	
+	public BouncyEncryption getEncryptor() {
+		return encryptor;
+	}
+
+	public void setEncryptor(BouncyEncryption encryptor) {
+		this.encryptor = encryptor;
+	}
+
 	private void Offline()
 	{
 		//User input loop

@@ -187,7 +187,7 @@ public class Reciever_Thread extends Thread
 												{
 													//Notify the client that the client they are trying to reach is unavailable
 													try {usrSemHashSemaphore.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}
-													userSemaphores		.get(mess[1]).release();
+													userSemaphores		.get(mess[1])	.release();
 													usrSemHashSemaphore	.release();
 													onlineUsrSemaphore	.release();
 													try {

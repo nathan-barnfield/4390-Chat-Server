@@ -15,6 +15,7 @@ public class Outgoing_Thread extends Thread
 	{
 		outgoingQueue = outQueue;
 		onlineUsers = userTable;
+		userSemaphores = userSemMap;
 	}
 	
 	public void run()

@@ -109,17 +109,17 @@ public class Authentication_Thread extends Thread
 					//Signal that we're ready to establish a TCP connection to the server
 					//Create a new user, set the encryptor, put it in the activeUsers
 					User newuser = new User(helloUsername, null);
-					
+					/*
 					try {
-						newuser.encryptor = new BouncyEncryption(rand, secretKey);
-						newuser.encryptor.InitCiphers();
-					} catch (NoSuchAlgorithmException e1) {
+						//newuser.encryptor = new BouncyEncryption(rand, secretKey);
+					//	newuser.encryptor.InitCiphers();
+				//	} catch (NoSuchAlgorithmException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
-					} catch (InvalidKeyException e) {
+				//	} catch (InvalidKeyException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					} catch (NoSuchProviderException e) {
+			/		} catch (NoSuchProviderException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (NoSuchPaddingException e) {
@@ -128,30 +128,16 @@ public class Authentication_Thread extends Thread
 					} catch (InvalidAlgorithmParameterException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					}
+					}*/
 					
 					Server.activeUsers.put(helloUsername, newuser); //Store in activeUsers
 					int cookie = genAndStoreCookie(newuser);
 					TCP_Welcome_Thread.cookieToUserMap.put(cookie, newuser); //Store in cookieToUserMap
 												
-					try {
-						byte [] encrypteddata = null;
-						encrypteddata = newuser.encryptor.Encrypt(Integer.toString(cookie) + "," + "8888");
-						packet = null;
-						packet = Packet_Helpers.arrayToPacket(encrypteddata, IpAddress, port);
-					} catch (ShortBufferException e1) {
-						// TODO Auto-generated catch block							
-						e1.printStackTrace();
-					} catch (IllegalBlockSizeException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (BadPaddingException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
+					byte [] encrypteddata = null;
+					encrypteddata = new String(Integer.toString(cookie) + "," + "8888").getBytes();
+					packet = null;
+					packet = Packet_Helpers.arrayToPacket(encrypteddata, IpAddress, port);
 					
 					
 					try {

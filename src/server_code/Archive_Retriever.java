@@ -19,10 +19,10 @@ public class Archive_Retriever
 			
 	}
 	
-	 public static Queue retrieveHistory(String firstUser, String secondUser) throws FileNotFoundException, IOException
+	 public static Queue<String> retrieveHistory(String firstUser, String secondUser) throws FileNotFoundException, IOException
 	 {
 
-		 Queue myQueue = new LinkedList();
+		 Queue<String> myQueue = new LinkedList<String>();
 
 		 int compare = firstUser.compareTo(secondUser);
 		 if (compare < 0){

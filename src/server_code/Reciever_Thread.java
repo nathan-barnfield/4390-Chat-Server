@@ -2,10 +2,10 @@ package server_code;
 
 import java.io.*;
 
-import java.net.*;
+import java.net.*;import java.util.*;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Semaphore;import javax.crypto.BadPaddingException;import javax.crypto.IllegalBlockSizeException;import javax.crypto.ShortBufferException;
+import java.util.concurrent.Semaphore;import javax.crypto.BadPaddingException;import javax.crypto.IllegalBlockSizeException;import javax.crypto.ShortBufferException;
 
 public class Reciever_Thread extends Thread 
 {
@@ -25,21 +25,7 @@ public class Reciever_Thread extends Thread
 		private Semaphore					ckToUsrSemaphore	= null;
 		
 		
-		public Reciever_Thread	(	Socket connection, Reciever_Deps deps
-				
-					/*
-									HashMap<Integer, User> 		ckToUsr,
-									HashMap<String,User> 		activeUsers,
-									HashMap<String,Semaphore> 	usrSem,
-									BlockingQueue<Message> 		outMess,
-									String 						sessID,
-									Semaphore					sessIDSem,
-									Semaphore					usrSemHashSema,
-									Semaphore					onlineUsrSema,
-									Semaphore					ckToUsrSema,
-									BlockingQueue<Message>		messArchQueue
-									*/
-								)
+		public Reciever_Thread	(	Socket connection, Reciever_Deps deps)
 		{
 			socket 				= 	connection;
 			cookieToUserMap	 	=	TCP_Welcome_Thread.cookieToUserMap;
@@ -110,7 +96,7 @@ public class Reciever_Thread extends Thread
 				
 					return;
 				}
-			
+						//put this in the while loop?
 			String inMess = null;
 			
 			//while connected parse messages as they are sent
@@ -118,8 +104,8 @@ public class Reciever_Thread extends Thread
 			{
 				try {inMess = in.readLine();} catch (IOException e) {System.out.println("In Reciever_thread: unable to recieve inMess transmission from: " + socket.getInetAddress().toString()); e.printStackTrace();}				String decryptedMess = null;
 				try {decryptedMess = thisThreadsUser.getEncryptor().Decrypt(inMess.getBytes());} catch (ShortBufferException | IllegalBlockSizeException | BadPaddingException | IOException e2) {e2.printStackTrace();}
-				String[] mess = decryptedMess.split("\u001e");
-				System.out.println("Recieved Message: " + decryptedMess);
+				String[] mess = inMess.split("\u001e");
+			//	System.out.println("Recieved Message: " + inMess);
 								
 				switch(mess[0])
 				{				
@@ -262,7 +248,7 @@ public class Reciever_Thread extends Thread
 											}
 										break;
 										
-				case "HISTORY_REQ":		
+				case "HISTORY_REQ":		Queue<String> histMessages = null;										try {histMessages = Archive_Retriever.retrieveHistory(thisThreadsUser.getUserID(), mess[1]);} catch (IOException e4) {e4.printStackTrace();}										while(!histMessages.isEmpty())										{											try {outMessages.put(new Message("HISTORY_RES",mess[1],thisThreadsUser.getUserID(), "HISTORY_RESP\u001e" + mess[1] +"\u001e" + histMessages.poll(),null));} catch (InterruptedException e) {e.printStackTrace();}										}
 										break;														case "DISCONNECT":		try {in.close();} catch (IOException e3) {e3.printStackTrace();}										out.close();										try {socket.close();} catch (IOException e2) {e2.printStackTrace();}																				Semaphore userTemp = null;										try {usrSemHashSemaphore	.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}										userTemp = userSemaphores	.get(thisThreadsUser	.getUserID());										userSemaphores				.remove(thisThreadsUser	.getUserID());										usrSemHashSemaphore			.release();																				try {userTemp.acquire();} catch (InterruptedException e) {e.printStackTrace();}										try {onlineUsrSemaphore.acquire();} catch (InterruptedException e) {e.printStackTrace();}										onlineUsers.remove(thisThreadsUser.getUserID());										onlineUsrSemaphore.release();										userTemp.release();																				return;
 				
 				}

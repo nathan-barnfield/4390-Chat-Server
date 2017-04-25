@@ -187,7 +187,7 @@ public class Reciever_Thread extends Thread
 												{
 													//Notify the client that the client they are trying to reach is unavailable
 													try {usrSemHashSemaphore.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}
-													userSemaphores		.get(mess[1])	.release();
+													userSemaphores		.get(mess[1]).release();
 													usrSemHashSemaphore	.release();
 													onlineUsrSemaphore	.release();
 													try {
@@ -263,7 +263,7 @@ public class Reciever_Thread extends Thread
 										break;
 										
 				case "HISTORY_REQ":		
-										break;
+										break;														case "DISCONNECT":		try {in.close();} catch (IOException e3) {e3.printStackTrace();}										out.close();										try {socket.close();} catch (IOException e2) {e2.printStackTrace();}																				Semaphore userTemp = null;										try {usrSemHashSemaphore	.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}										userTemp = userSemaphores	.get(thisThreadsUser	.getUserID());										userSemaphores				.remove(thisThreadsUser	.getUserID());										usrSemHashSemaphore			.release();																				try {userTemp.acquire();} catch (InterruptedException e) {e.printStackTrace();}										try {onlineUsrSemaphore.acquire();} catch (InterruptedException e) {e.printStackTrace();}										onlineUsers.remove(thisThreadsUser.getUserID());										onlineUsrSemaphore.release();										userTemp.release();																				return;
 				
 				}
 				

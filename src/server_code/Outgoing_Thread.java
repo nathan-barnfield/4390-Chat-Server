@@ -9,6 +9,8 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.ShortBufferException;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.*;
 
 public class Outgoing_Thread extends Thread
@@ -37,13 +39,25 @@ public class Outgoing_Thread extends Thread
 				try { userSemaphores.get(currentMess.getRecieveingUser()).acquire();} catch (InterruptedException e) {System.out.println("in Outgoing_Thread: Could not acquire User\"" + currentMess.getRecieveingUser()+"\"'s mutex");e.printStackTrace();}
 				
 				User recieveUser = onlineUsers.get(currentMess.getRecieveingUser());
-			
-				try {
-					recieveUser.getOut().println(recieveUser.getEncryptor().Encrypt(currentMess.getData()).toString());} catch (ShortBufferException | IllegalBlockSizeException | BadPaddingException | IOException e) {e.printStackTrace();}
+				
+				try {sendMessage(recieveUser.getOutStream(), recieveUser.getEncryptor().Encrypt(currentMess.getData()));} catch (ShortBufferException | IllegalBlockSizeException | BadPaddingException | IOException e) {e.printStackTrace();}
+//				try {recieveUser.getOut().println(recieveUser.getEncryptor().Encrypt(currentMess.getData()).toString());} catch (ShortBufferException | IllegalBlockSizeException | BadPaddingException | IOException e) {e.printStackTrace();}
 				
 				userSemaphores.get(currentMess.getRecieveingUser()).release();
 			}
 		}
+	}
+	
+	//This function's purpose is to take a byte array and push it through the outputStream.
+	//It first sends the length of the message being sent so that the reciever knows how many bytes to read from the stream
+	private void sendMessage(OutputStream out, byte[] message)
+	{
+		//Get the length of the message and place it into a byte array we can push through the stream
+		byte[] messageLen = ByteBuffer.allocate(Integer.BYTES).putInt(message.length).array();
+		
+		//Send the length of the message first, then send the actual message
+		try {out.write(messageLen);} 	catch (IOException e) {System.out.println("IN OUTGOING_THREAD: Could not push length of message through output stream");e.printStackTrace();}
+		try {out.write(message);} 		catch (IOException e) {System.out.println("IN OUTGOING_THREAD: Could not push message through output stream");			e.printStackTrace();}
 	}
 }
 

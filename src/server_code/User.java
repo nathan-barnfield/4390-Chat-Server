@@ -1,5 +1,6 @@
 package server_code;
 
+import java.io.OutputStream;
 import java.io.PrintWriter;
 
 public class User 
@@ -11,11 +12,12 @@ public class User
 	private boolean 			isReachable 	= 	false;
 	private String				currentSessID	= 	null;
 	private String				chatPartner		=	null;
-	
+	private OutputStream		outStream		=	null;
 	
 	
 
 
+	
 	public User(String name, PrintWriter printer)
 	{
 		//Read file for userID and key
@@ -23,6 +25,15 @@ public class User
 		out = printer;
 		//Enter offline state
 	}
+	
+	public OutputStream getOutStream() {
+		return outStream;
+	}
+
+	public void setOutStream(OutputStream outStream) {
+		this.outStream = outStream;
+	}
+
 	
 	public PrintWriter getOut() {
 		return out;

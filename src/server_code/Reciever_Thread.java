@@ -2,10 +2,9 @@ package server_code;
 
 import java.io.*;
 
-import java.net.*;
-import java.util.HashMap;
+import java.net.*;import java.nio.ByteBuffer;import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Semaphore;import javax.crypto.BadPaddingException;import javax.crypto.IllegalBlockSizeException;import javax.crypto.ShortBufferException;
+import java.util.concurrent.Semaphore;import javax.crypto.BadPaddingException;import javax.crypto.IllegalBlockSizeException;import javax.crypto.ShortBufferException;import org.omg.CORBA_2_3.portable.InputStream;
 
 public class Reciever_Thread extends Thread 
 {
@@ -81,7 +80,7 @@ public class Reciever_Thread extends Thread
 					
 					//initiate the User with prerequisite information
 					thisThreadsUser = thisUser;
-					thisUser.setOut(out);
+					thisUser.setOut(out);					try {thisUser.setOutStream(socket.getOutputStream());} catch (IOException e2) {System.out.println("In Reciever_Thread: Could not retrieve socket's OutputStream for user \"" + thisUser.getUserID() + "\"");e2.printStackTrace();}
 					thisUser.setReachable(true);
 					
 					try {usrSemHashSemaphore		.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}
@@ -111,13 +110,13 @@ public class Reciever_Thread extends Thread
 					return;
 				}
 			
-			String inMess = null;
+			byte[] inMess = null;
 			
 			//while connected parse messages as they are sent
 			while(true)
 			{
-				try {inMess = in.readLine();} catch (IOException e) {System.out.println("In Reciever_thread: unable to recieve inMess transmission from: " + socket.getInetAddress().toString()); e.printStackTrace();}				String decryptedMess = null;
-				try {decryptedMess = thisThreadsUser.getEncryptor().Decrypt(inMess.getBytes());} catch (ShortBufferException | IllegalBlockSizeException | BadPaddingException | IOException e2) {e2.printStackTrace();}
+				try {inMess = readFromStream(socket.getInputStream());} catch (IOException e) {System.out.println("In Reciever_thread: unable to recieve inMess transmission from: " + socket.getInetAddress().toString()); e.printStackTrace();}				String decryptedMess = null;
+				try {decryptedMess = thisThreadsUser.getEncryptor().Decrypt(inMess);} catch (ShortBufferException | IllegalBlockSizeException | BadPaddingException | IOException e2) {e2.printStackTrace();}
 				String[] mess = decryptedMess.split("\u001e");
 				System.out.println("Recieved Message: " + decryptedMess);
 								
@@ -277,7 +276,7 @@ public class Reciever_Thread extends Thread
 			//try {sessIDSema.acquire();} catch (InterruptedException e) {"In Reciever_Thread incrementSessID function: Could not acquire session ID semaphore"); e.printStackTrace();}
 			String newSessID = Integer.toString(Integer.parseInt(currentSessID) + 1);
 			currentSessID = newSessID;
-		}
-		
+		}		//This function is designed to read a message sent over the stream		//It will first read an integer off the stream, then read that integers length off of the stream. The second read will contain the message
+		private byte[] readFromStream(java.io.InputStream inputStream)		{			byte[] messLength = new byte[4];						try {inputStream.read(messLength);} catch (IOException e) {System.out.println("In Reciever Thread: Could not read message length from user \"" + thisThreadsUser.getUserID() + "'s\" stream");e.printStackTrace();}						byte[] message = new byte[ByteBuffer.wrap(messLength).getInt()];						try {inputStream.read(message);} catch (IOException e) {System.out.println("In Reciever Thread: Could not read message from user \"" + thisThreadsUser.getUserID() + "'s\" stream");e.printStackTrace();}						return message;					}				
 }
 

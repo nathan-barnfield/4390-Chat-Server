@@ -111,24 +111,12 @@ public class Authentication_Thread extends Thread
 					User newuser = new User(helloUsername, null);
 					
 					try {
-						newuser.encryptor = new BouncyEncryption(rand, secretKey);
-						newuser.encryptor.InitCiphers();
+						newuser.encryptor = new Jasypt_Encryptor(rand, secretKey);
+						//newuser.encryptor.InitCiphers();
 					} catch (NoSuchAlgorithmException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
-					} catch (InvalidKeyException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (NoSuchProviderException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (NoSuchPaddingException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (InvalidAlgorithmParameterException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					} catch (IOException e) {						// TODO Auto-generated catch block						e.printStackTrace();					}
 					
 					Server.activeUsers.put(helloUsername, newuser); //Store in activeUsers
 					int cookie = genAndStoreCookie(newuser);
@@ -146,9 +134,6 @@ public class Authentication_Thread extends Thread
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					} catch (BadPaddingException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}

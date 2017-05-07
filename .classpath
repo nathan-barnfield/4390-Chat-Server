@@ -2,5 +2,9 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/jasypt-1.9.2/lib/jasypt-1.9.2.jar"/>
+	<classpathentry kind="lib" path="C:/jasypt-1.9.2/lib/jasypt-1.9.2-javadoc.jar"/>
+	<classpathentry kind="lib" path="C:/jasypt-1.9.2/lib/jasypt-1.9.2-lite.jar"/>
+	<classpathentry kind="lib" path="C:/jasypt-1.9.2/lib/jasypt-1.9.2-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

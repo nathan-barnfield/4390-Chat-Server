@@ -116,7 +116,7 @@ public class Reciever_Thread extends Thread
 			while(true)
 			{
 				try {inMess = readFromStream(socket.getInputStream());} catch (IOException e) {System.out.println("In Reciever_thread: unable to recieve inMess transmission from: " + socket.getInetAddress().toString()); e.printStackTrace();}				String decryptedMess = null;
-				try {decryptedMess = thisThreadsUser.getEncryptor().Decrypt(inMess);} catch (ShortBufferException | IllegalBlockSizeException | BadPaddingException | IOException e2) {e2.printStackTrace();}
+				try {decryptedMess = thisThreadsUser.getEncryptor().Decrypt(inMess);} catch (ShortBufferException | IllegalBlockSizeException | BadPaddingException e2) {e2.printStackTrace();}
 				String[] mess = decryptedMess.split("\u001e");
 				System.out.println("Recieved Message: " + decryptedMess);
 								

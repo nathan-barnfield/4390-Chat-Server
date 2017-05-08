@@ -7,7 +7,6 @@ public class User
 	private String 				userID;
 	private int 				keyValue;
 	private PrintWriter 		out 			= 	null;
-	public BouncyEncryption 	encryptor		= 	null;
 	private boolean 			isReachable 	= 	false;
 	private String				currentSessID	= 	null;
 	private String				chatPartner		=	null;
@@ -65,14 +64,6 @@ public class User
 		this.chatPartner = chatPartner;
 	}
 	
-	public BouncyEncryption getEncryptor() {
-		return encryptor;
-	}
-
-	public void setEncryptor(BouncyEncryption encryptor) {
-		this.encryptor = encryptor;
-	}
-
 	private void Offline()
 	{
 		//User input loop

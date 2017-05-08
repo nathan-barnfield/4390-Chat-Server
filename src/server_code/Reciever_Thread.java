@@ -96,14 +96,13 @@ public class Reciever_Thread extends Thread
 				
 					return;
 				}
-						//put this in the while loop?
+			System.out.println("User \"" + thisThreadsUser.getUserID() + "\" has connected");			//put this in the while loop?
 			String inMess = null;
 			
 			//while connected parse messages as they are sent
 			while(true)
 			{
-				try {inMess = in.readLine();} catch (IOException e) {System.out.println("In Reciever_thread: unable to recieve inMess transmission from: " + socket.getInetAddress().toString()); e.printStackTrace();}				String decryptedMess = null;
-				try {decryptedMess = thisThreadsUser.getEncryptor().Decrypt(inMess.getBytes());} catch (ShortBufferException | IllegalBlockSizeException | BadPaddingException | IOException e2) {e2.printStackTrace();}
+				try {inMess = in.readLine();} catch (IOException e) {System.out.println("In Reciever_thread: unable to recieve inMess transmission from: " + socket.getInetAddress().toString()); e.printStackTrace();}
 				String[] mess = inMess.split("\u001e");
 			//	System.out.println("Recieved Message: " + inMess);
 								

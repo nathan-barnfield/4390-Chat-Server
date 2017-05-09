@@ -14,19 +14,24 @@ import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 
 public class User 
 {
+	private Reciever_Thread		recieveThread	=	null;
+	
+
 	private String 				userID;
 	private int 				keyValue;
 	private PrintWriter 		out 			= 	null;
 	private boolean 			isReachable 	= 	false;
 	private String				currentSessID	= 	null;
 	private String				chatPartner		=	null;
-	private byte[] key = null;
-	private int rand;
-	private Cipher cipher = null;
-	private Cipher dcipher = null;
+	private byte[] 				key 			= 	null;
+	private int 				rand;
+	private Cipher 				cipher 			= 	null;
+	private Cipher 				dcipher 		= 	null;
+	private long 				lastActive;
 	
 	
 	
+
 
 
 	public User(String name, PrintWriter printer)
@@ -35,6 +40,28 @@ public class User
 		userID = name;
 		out = printer;
 		//Enter offline state
+	}
+	
+
+	public long getLastActive() 
+	{
+		return lastActive;
+	}
+
+	public void setLastActive(long lastActive) 
+	{
+		this.lastActive = lastActive;
+	}
+	
+	public Reciever_Thread getRecieveThread()
+	{
+		return recieveThread;
+	}
+
+
+	public void setRecieveThread(Reciever_Thread recieveThread) 
+	{
+		this.recieveThread = recieveThread;
 	}
 	
 	public void genKey() throws NoSuchAlgorithmException

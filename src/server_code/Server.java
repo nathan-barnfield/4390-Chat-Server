@@ -30,7 +30,7 @@ public class Server {
 		printDB();		loadSessID(sessIDFile);		System.out.println(currentChatSess);
 		UDP_Handshake handshake = new UDP_Handshake("test?");		Outgoing_Thread outThread = new Outgoing_Thread(messageQueue, activeUsers, userSemaphores);				outThread.start();
 		handshake.start();				rec_deps =  new Reciever_Deps	(				activeUsers,				userSemaphores,				messageQueue,				currentChatSess,				sessIDSem,				usrSemHashSemaphore,				onlineUsersSemaphore,				ckToUsrSemapore			);
-		TCPWelcome = new TCP_Welcome_Thread(new HashMap<Integer,User>(), rec_deps);
+		TCPWelcome = new TCP_Welcome_Thread(new HashMap<Integer,User>(), rec_deps);		Time_Out_Thread timeOutThread = new Time_Out_Thread(rec_deps);		timeOutThread.start();		
 		TCPWelcome.start();		Archival_Thread archiver = new Archival_Thread();		archiver.start();		
 	}
 

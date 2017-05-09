@@ -11,8 +11,7 @@ public class Reciever_Thread extends Thread
 {
 		private User						thisThreadsUser		= null;
 		private Socket 						socket 				= null;
-		private BufferedReader 				in 					= null;
-		private PrintWriter 				out 				= null;
+		private BufferedReader 				in 					= null;		private PrintWriter 				out 				= null;
 		private HashMap<Integer, User> 		cookieToUserMap		= null;
 		private HashMap<String, User> 		onlineUsers 		= null;
 		private HashMap<String, Semaphore> 	userSemaphores 		= null;
@@ -96,16 +95,16 @@ public class Reciever_Thread extends Thread
 				
 					return;
 				}
-			System.out.println("User \"" + thisThreadsUser.getUserID() + "\" has connected");			//put this in the while loop?
+			System.out.println("User \"" + thisThreadsUser.getUserID() + "\" has connected");						thisThreadsUser.setRecieveThread(this);			//put this in the while loop?
 			String inMess = null;
 			
 			//while connected parse messages as they are sent
 			while(true)
 			{				
-				try {inMess = thisThreadsUser.decrypt(in.readLine());} 					catch (IOException | IllegalBlockSizeException | BadPaddingException e) 						{							System.out.println("In Reciever_thread: unable to recieve inMess transmission from: " + socket.getInetAddress().toString()); 														try {onlineUsrSemaphore	.acquire();} 										catch (InterruptedException e1) {e1.printStackTrace();}								try {usrSemHashSemaphore.acquire();} 										catch (InterruptedException e1) {e1.printStackTrace();}							try {userSemaphores		.get(thisThreadsUser	.getUserID()).acquire();} 	catch (InterruptedException e1) {e1.printStackTrace();}							onlineUsers				.remove(thisThreadsUser	.getUserID());							onlineUsrSemaphore		.release();							userSemaphores			.remove(thisThreadsUser	.getUserID());							usrSemHashSemaphore		.release();							return;								}
+				try {inMess = thisThreadsUser.decrypt(in.readLine());} 					catch (IOException | IllegalBlockSizeException | BadPaddingException e) 						{							System.out.println("In Reciever_thread: unable to recieve inMess transmission from: " + socket.getInetAddress().toString()); 														try {onlineUsrSemaphore	.acquire();} 										catch (InterruptedException e1) {e1.printStackTrace();}								try {usrSemHashSemaphore.acquire();} 										catch (InterruptedException e1) {e1.printStackTrace();}							try {userSemaphores		.get(thisThreadsUser	.getUserID()).acquire();} 	catch (InterruptedException e1) {e1.printStackTrace();}														//If the User was in a chat, close out that chat gracefully							if(!thisThreadsUser.getChatPartner().equals(null) && !thisThreadsUser.getCurrentSessID().equals(null) && !thisThreadsUser.isReachable())								{									try { outMessages.put(new Message("END_NOTIF",											thisThreadsUser.getChatPartner(),											thisThreadsUser.getUserID(),											"END_NOTIF\u001e" + thisThreadsUser.getCurrentSessID(),											null											));} catch (InterruptedException e1) {e1.printStackTrace();}																	try {userSemaphores		.get(thisThreadsUser.getChatPartner()).acquire();} catch (InterruptedException e1) {e1.printStackTrace();}									User temp = onlineUsers	.get(thisThreadsUser.getChatPartner());									temp.setChatPartner		(null);									temp.setReachable		(true);									temp.setCurrentSessID	(null);									userSemaphores.get(thisThreadsUser.getChatPartner()).release();									}														onlineUsers				.remove(thisThreadsUser	.getUserID());							onlineUsrSemaphore		.release();							userSemaphores			.remove(thisThreadsUser	.getUserID());							usrSemHashSemaphore		.release();							return;								}
 				String[] mess = inMess.split("\u001e");
 			//	System.out.println("Recieved Message: " + inMess);
-				/*System.out.println(inMess);				try {					System.out.println(thisThreadsUser.decrypt(inMess));				} catch (IllegalBlockSizeException | BadPaddingException e5) {					// TODO Auto-generated catch block					e5.printStackTrace();				}*/				
+				/*System.out.println(inMess);				try {					System.out.println(thisThreadsUser.decrypt(inMess));				} catch (IllegalBlockSizeException | BadPaddingException e5) {					// TODO Auto-generated catch block					e5.printStackTrace();				}*/				thisThreadsUser.setLastActive(System.currentTimeMillis());
 				switch(mess[0])
 				{										//If the user tries to talk to themselves, send back unreachable message
 				case "CHAT_REQUEST":	if(thisThreadsUser.getUserID().equals(mess[1]))											{												try {													outMessages.put(new Message(	"UNREACHABLE",													thisThreadsUser.getUserID(),													"SERVER",													"UNREACHABLE\u001e" + mess[1],													null												));} catch (InterruptedException e) {e.printStackTrace();}													break;											}																				try {onlineUsrSemaphore.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}	
@@ -263,6 +262,6 @@ public class Reciever_Thread extends Thread
 			String newSessID = Integer.toString(Integer.parseInt(currentSessID) + 1);
 			currentSessID = newSessID;
 		}
-		
+		public BufferedReader getIn() 		{			return in;		}		public Socket getSocket() 		{			return socket;		}
 }
 

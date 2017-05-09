@@ -37,6 +37,11 @@ public class Time_Out_Thread extends Thread
 	{
 		while(true)
 		{
+			System.out.println("Current availability of system semaphores:");
+			System.out.println("sessIDSem permits: " + sessIDSem.availablePermits());
+			System.out.println("usrSemHashSemaphore permits: " + usrSemHashSemaphore.availablePermits());
+			System.out.println("onlineUsersSemaphore permits: " + onlineUsersSemaphore.availablePermits());
+
 			//Wait one second before checking everything
 			try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
 			

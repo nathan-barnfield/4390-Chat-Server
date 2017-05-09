@@ -68,7 +68,7 @@ public class Authentication_Thread extends Thread
 			DatagramPacket cpacket = null;
 			//Generate a challenge hash and get the challenge packet storing the rand to send to user
 			try {
-				cpacket = challengePacket(secretKey);
+				cpacket = challengePacket(secretKey);				
 			} catch (NoSuchAlgorithmException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -131,14 +131,14 @@ public class Authentication_Thread extends Thread
 					}*/
 					
 					Server.activeUsers.put(helloUsername, newuser); //Store in activeUsers
-					int cookie = genAndStoreCookie(newuser);
+					int cookie = genAndStoreCookie(newuser);										newuser.setKey(secretKey);					newuser.setRand(rand);
 					TCP_Welcome_Thread.cookieToUserMap.put(cookie, newuser); //Store in cookieToUserMap
 												
 					byte [] encrypteddata = null;
 					encrypteddata = new String(Integer.toString(cookie) + "," + "8888").getBytes();
 					packet = null;
 					packet = Packet_Helpers.arrayToPacket(encrypteddata, IpAddress, port);
-					
+										try {						newuser.genKey();					} catch (NoSuchAlgorithmException e1) {						// TODO Auto-generated catch block						e1.printStackTrace();					}
 					
 					try {
 						socket.send(packet);
@@ -183,10 +183,10 @@ public class Authentication_Thread extends Thread
 	private DatagramPacket challengePacket(int sk) throws NoSuchAlgorithmException 
 	{
 		//First, generate the expected challenge and store the result in challenge
-		int key = rand+sk;
+		int key = rand+sk;		
 		StringBuilder sb = new StringBuilder();
 		sb.append(rand);
-		sb.append(sk);
+		sb.append(sk);		
 		key = Integer.parseInt(sb.toString());
 		byte[] password = BigInteger.valueOf(key).toByteArray();
 		

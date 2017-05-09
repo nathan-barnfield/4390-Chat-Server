@@ -1,6 +1,9 @@
 package server_code;
 
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class User 
 {
@@ -10,6 +13,8 @@ public class User
 	private boolean 			isReachable 	= 	false;
 	private String				currentSessID	= 	null;
 	private String				chatPartner		=	null;
+	private byte[] key = null;
+	private int rand;
 	
 	
 	
@@ -23,10 +28,52 @@ public class User
 		//Enter offline state
 	}
 	
+	public void genKey() throws NoSuchAlgorithmException
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append(rand);
+		sb.append(keyValue);
+		String passwordToHash = sb.toString();			
+        String generatedPassword = null;
+ 
+        
+            // Create MessageDigest instance for MD5
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            //Add password bytes to digest
+            md.update(passwordToHash.getBytes());
+            //Get the hash's bytes 
+            byte[] bytes = md.digest();
+            this.key = bytes;
+
+            //This bytes[] has bytes in decimal format;
+            //Convert it to hexadecimal format
+            StringBuilder sb2 = new StringBuilder();
+            for(int i=0; i< bytes.length ;i++)
+            {
+                sb2.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+            }
+
+            generatedPassword = sb2.toString();
+            System.out.println(generatedPassword);
+		
+		
+		
+	}
+	
 	public PrintWriter getOut() {
 		return out;
 	}
 
+	public void setRand(int randy)
+	{
+		this.rand = randy;
+	}
+	
+	public void setKey(int secry)
+	{
+		this.keyValue = secry;
+	}
+	
 	public void setOut(PrintWriter out) {
 		this.out = out;
 	}

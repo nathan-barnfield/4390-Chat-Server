@@ -131,14 +131,14 @@ public class Authentication_Thread extends Thread
 					}*/
 					
 					Server.activeUsers.put(helloUsername, newuser); //Store in activeUsers
-					int cookie = genAndStoreCookie(newuser);										newuser.setKey(secretKey);					newuser.setRand(rand);
+					int cookie = genAndStoreCookie(newuser);										newuser.setKey(secretKey);					newuser.setRand(rand);										try {newuser.genKey();} catch (NoSuchAlgorithmException e1) {e1.printStackTrace();}					
 					TCP_Welcome_Thread.cookieToUserMap.put(cookie, newuser); //Store in cookieToUserMap
 												
 					byte [] encrypteddata = null;
-					encrypteddata = new String(Integer.toString(cookie) + "," + "8888").getBytes();
-					packet = null;
+					try {encrypteddata = newuser.encrypt(new String(Integer.toString(cookie) + "," + "8888")).getBytes();} catch (IllegalBlockSizeException | BadPaddingException e1) {e1.printStackTrace();}
+					packet = null;					
 					packet = Packet_Helpers.arrayToPacket(encrypteddata, IpAddress, port);
-										try {						newuser.genKey();					} catch (NoSuchAlgorithmException e1) {						// TODO Auto-generated catch block						e1.printStackTrace();					}
+										
 					
 					try {
 						socket.send(packet);

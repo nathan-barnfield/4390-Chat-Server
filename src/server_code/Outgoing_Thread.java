@@ -38,7 +38,7 @@ public class Outgoing_Thread extends Thread
 				
 				User recieveUser = onlineUsers.get(currentMess.getRecieveingUser());
 			
-				recieveUser.getOut().println(currentMess.getData());
+				try {recieveUser.getOut().println(recieveUser.encrypt(currentMess.getData()));} catch (IllegalBlockSizeException | BadPaddingException e) {e.printStackTrace();}
 				
 				userSemaphores.get(currentMess.getRecieveingUser()).release();
 			}

@@ -65,7 +65,7 @@ public class UDP_Handshake extends Thread
 				BlockingQueue<DatagramPacket> newQueue = new LinkedBlockingQueue<DatagramPacket>();
 				
 				currentConnections.put(packet.getAddress(), newQueue);
-				new Authentication_Thread(packet.getAddress(), packet.getPort(), newQueue, socket).start();
+				new Authentication_Thread(packet.getAddress(), packet.getPort(), newQueue, socket, currentConnections).start();
 				
 				try {
 					newQueue.put(packet);

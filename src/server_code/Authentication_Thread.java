@@ -34,15 +34,15 @@ public class Authentication_Thread extends Thread
 	int port = -1;
 	int rand;
 	int secretKey = -1;
-	byte[] challenge = new byte [1024];
+	byte[] challenge = new byte [1024];		Map<InetAddress,BlockingQueue<DatagramPacket>> currentConnections = null;
 	
-	public Authentication_Thread(InetAddress address, int port, BlockingQueue<DatagramPacket> queue, DatagramSocket socket)
+	public Authentication_Thread(InetAddress address, int port, BlockingQueue<DatagramPacket> queue, DatagramSocket socket, Map<InetAddress,BlockingQueue<DatagramPacket>> currentConnections)
 	{
 		this.IpAddress = address;
 		this.packetQueue = queue;
 		this.socket = socket;
 		this.port = port;
-		this.rand = ThreadLocalRandom.current().nextInt(0, 1025);
+		this.rand = ThreadLocalRandom.current().nextInt(0, 1025);		this.currentConnections = currentConnections;
 	}
 	
 	
@@ -176,7 +176,7 @@ public class Authentication_Thread extends Thread
 			//Send a "User does not exist" message back to client
 		}
 		
-
+		currentConnections.remove(IpAddress);
 	}
 	
 	

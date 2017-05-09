@@ -43,7 +43,7 @@ public class Time_Out_Thread extends Thread
 			System.out.println("onlineUsersSemaphore permits: " + onlineUsersSemaphore.availablePermits());
 
 			//Wait one second before checking everything
-			try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
+			try {Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
 			
 			try {sessIDSem.acquire();} catch (InterruptedException e) {e.printStackTrace();}
 			String temp = new String(currentSessID);
@@ -56,7 +56,9 @@ public class Time_Out_Thread extends Thread
 				writer.println(temp);
 				lastKnownSessID = new String(temp);
 			}
-			
+			try {usrSemHashSemaphore.acquire();} catch (InterruptedException e) {e.printStackTrace();}
+			try {onlineUsersSemaphore.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}
+		
 			Set<String> usersSet = new HashSet<String>(activeUsers.keySet());
 			
 			Iterator<String> itr = usersSet.iterator();
@@ -64,9 +66,9 @@ public class Time_Out_Thread extends Thread
 			while(itr.hasNext())
 			{
 				String userName = itr.next();
-				try {usrSemHashSemaphore.acquire();} catch (InterruptedException e) {e.printStackTrace();}
+				//try {usrSemHashSemaphore.acquire();} catch (InterruptedException e) {e.printStackTrace();}
 				try {userSemaphores.get(userName).acquire();} catch (InterruptedException e) {e.printStackTrace();}
-				usrSemHashSemaphore.release();
+				//usrSemHashSemaphore.release();
 				
 				try {onlineUsersSemaphore.acquire();} catch (InterruptedException e) {e.printStackTrace();}
 				User tempUser = activeUsers.get(userName);
@@ -84,7 +86,8 @@ public class Time_Out_Thread extends Thread
 				userSemaphores.get(userName).release();
 				usrSemHashSemaphore.release();
 			}
-			
+			onlineUsersSemaphore.release();
+			usrSemHashSemaphore.release();
 		}
 	}
 }

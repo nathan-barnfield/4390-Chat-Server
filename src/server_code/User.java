@@ -5,6 +5,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.spec.SecretKeySpec;
+
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
+
 public class User 
 {
 	private String 				userID;
@@ -15,6 +22,8 @@ public class User
 	private String				chatPartner		=	null;
 	private byte[] key = null;
 	private int rand;
+	private Cipher cipher = null;
+	private Cipher dcipher = null;
 	
 	
 	
@@ -56,8 +65,45 @@ public class User
             generatedPassword = sb2.toString();
             System.out.println(generatedPassword);
 		
+            initCiphers();
 		
-		
+	}
+	
+	public void initCiphers()
+	{
+		 try
+	        {
+			 
+	            this.cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+	            final SecretKeySpec secretKey = new SecretKeySpec(this.key, "AES");
+	            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+	            
+	            this.dcipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+	            dcipher.init(Cipher.DECRYPT_MODE, secretKey);
+	            
+	            
+	            
+	        }
+	        catch (Exception e)
+	        {
+	           e.printStackTrace();
+	        }
+	}
+	
+	public String encrypt(String strToEncrypt) throws IllegalBlockSizeException, BadPaddingException
+	{
+		byte[] plainTextByte = strToEncrypt.getBytes();
+		byte[] encryptedByte = cipher.doFinal(plainTextByte);
+		String encryptedText = Base64.encode(encryptedByte);
+		return encryptedText;
+	}
+	
+	public String decrypt(String strToDecrypt) throws IllegalBlockSizeException, BadPaddingException
+	{
+		byte[] encryptedTextByte = Base64.decode(strToDecrypt);
+		byte[] decryptedByte = dcipher.doFinal(encryptedTextByte);
+		String decryptedText = new String(decryptedByte);
+		return decryptedText;
 	}
 	
 	public PrintWriter getOut() {

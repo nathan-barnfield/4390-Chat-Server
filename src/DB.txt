@@ -1,6 +1,6 @@
-	UserA
+UserA
 123456
 UserB
 789012
-User C
+UserC
 135711

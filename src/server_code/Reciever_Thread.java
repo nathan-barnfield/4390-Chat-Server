@@ -133,7 +133,7 @@ public class Reciever_Thread extends Thread
 													
 													tempClientB			.setCurrentSessID(currentSessID);
 													thisThreadsUser		.setCurrentSessID(currentSessID);
-													tempClientB			.setChatPartner(thisThreadsUser.getChatPartner());
+													tempClientB			.setChatPartner(thisThreadsUser.getUserID());
 													thisThreadsUser		.setChatPartner(tempClientB.getUserID());
 													
 													incrementSessID();

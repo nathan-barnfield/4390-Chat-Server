@@ -28,6 +28,7 @@ public class TCP_Welcome_Thread extends Thread
 			
 			while(true)
 			{
+				
 				Socket temp = new Socket();
 				
 				try {temp = listener.accept();} catch (IOException e) {System.out.println("In TCP_Welcome_Thread: Failed to accept connection from open socket");e.printStackTrace();}

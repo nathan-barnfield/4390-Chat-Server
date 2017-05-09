@@ -101,14 +101,14 @@ public class Reciever_Thread extends Thread
 			
 			//while connected parse messages as they are sent
 			while(true)
-			{
-				try {inMess = in.readLine();} catch (IOException e) {System.out.println("In Reciever_thread: unable to recieve inMess transmission from: " + socket.getInetAddress().toString()); e.printStackTrace();}
+			{				
+				try {inMess = in.readLine();} 					catch (IOException e) 						{							System.out.println("In Reciever_thread: unable to recieve inMess transmission from: " + socket.getInetAddress().toString()); 														try {onlineUsrSemaphore	.acquire();} 										catch (InterruptedException e1) {e1.printStackTrace();}								try {usrSemHashSemaphore.acquire();} 										catch (InterruptedException e1) {e1.printStackTrace();}							try {userSemaphores		.get(thisThreadsUser	.getUserID()).acquire();} 	catch (InterruptedException e1) {e1.printStackTrace();}							onlineUsers				.remove(thisThreadsUser	.getUserID());							onlineUsrSemaphore		.release();							userSemaphores			.remove(thisThreadsUser	.getUserID());							usrSemHashSemaphore		.release();							return;								}
 				String[] mess = inMess.split("\u001e");
 			//	System.out.println("Recieved Message: " + inMess);
 								
 				switch(mess[0])
-				{				
-				case "CHAT_REQUEST":	try {onlineUsrSemaphore.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}	
+				{										//If the user tries to talk to themselves, send back unreachable message
+				case "CHAT_REQUEST":	if(thisThreadsUser.getUserID().equals(mess[1]))											{												try {													outMessages.put(new Message(	"UNREACHABLE",													thisThreadsUser.getUserID(),													"SERVER",													"UNREACHABLE\u001e" + mess[1],													null												));} catch (InterruptedException e) {e.printStackTrace();}													break;											}																				try {onlineUsrSemaphore.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}	
 				
 										if(onlineUsers.containsKey(mess[1]))
 											{

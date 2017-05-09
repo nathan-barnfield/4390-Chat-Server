@@ -50,7 +50,7 @@ public class Reciever_Thread extends Thread
 			String connMess = null;
 			 
 			//Read in the first message sent by the client
-			try {connMess = in.readLine();} catch (IOException e) {System.out.println("In Reciever Thread: Unable to retrieve transmissions from: " + socket.getInetAddress().toString());e.printStackTrace();}
+			try {connMess = in.readLine();} catch (IOException e) {System.out.println("In Reciever Thread: Unable to retrieve transmissions from: " + socket.getInetAddress().toString()); return;}
 			
 			//Parse the first message ( All messages are comma delimeted)
 			String[] connMessParts = connMess.split("\u001e");
@@ -247,7 +247,7 @@ public class Reciever_Thread extends Thread
 											}
 										break;
 										
-				case "HISTORY_REQ":		Queue<String> histMessages = null;										try {histMessages = Archive_Retriever.retrieveHistory(thisThreadsUser.getUserID(), mess[1]);} catch (IOException e4) {e4.printStackTrace();}										while(!histMessages.isEmpty())										{											try {outMessages.put(new Message("HISTORY_RES",mess[1],thisThreadsUser.getUserID(), "HISTORY_RESP\u001e" + mess[1] +"\u001e" + histMessages.poll(),null));} catch (InterruptedException e) {e.printStackTrace();}										}
+				case "HISTORY_REQ":		Queue<String> histMessages = null;										try {histMessages = Archive_Retriever.retrieveHistory(thisThreadsUser.getUserID(), mess[1]);} catch (IOException e4) {e4.printStackTrace();}										while(!histMessages.isEmpty())										{											try {outMessages.put(new Message("HISTORY_RES",thisThreadsUser.getUserID(),thisThreadsUser.getUserID(), "HISTORY_RESP\u001e" + mess[1] +"\u001e" + histMessages.poll(),null));} catch (InterruptedException e) {e.printStackTrace();}										}
 										break;														case "DISCONNECT":		try {in.close();} catch (IOException e3) {e3.printStackTrace();}										out.close();										try {socket.close();} catch (IOException e2) {e2.printStackTrace();}																				Semaphore userTemp = null;										try {usrSemHashSemaphore	.acquire();} catch (InterruptedException e1) {e1.printStackTrace();}										userTemp = userSemaphores	.get(thisThreadsUser	.getUserID());										userSemaphores				.remove(thisThreadsUser	.getUserID());										usrSemHashSemaphore			.release();																				try {userTemp.acquire();} catch (InterruptedException e) {e.printStackTrace();}										try {onlineUsrSemaphore.acquire();} catch (InterruptedException e) {e.printStackTrace();}										onlineUsers.remove(thisThreadsUser.getUserID());										onlineUsrSemaphore.release();										userTemp.release();																				return;
 				
 				}

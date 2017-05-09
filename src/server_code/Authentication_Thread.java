@@ -135,7 +135,7 @@ public class Authentication_Thread extends Thread
 					TCP_Welcome_Thread.cookieToUserMap.put(cookie, newuser); //Store in cookieToUserMap
 												
 					byte [] encrypteddata = null;
-					try {encrypteddata = newuser.encrypt(new String(Integer.toString(cookie) + "," + "8888")).getBytes();} catch (IllegalBlockSizeException | BadPaddingException e1) {e1.printStackTrace();}
+					encrypteddata = new String(Integer.toString(cookie) + "," + "8888").getBytes();
 					packet = null;					
 					packet = Packet_Helpers.arrayToPacket(encrypteddata, IpAddress, port);
 										
